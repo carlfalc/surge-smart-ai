@@ -14,7 +14,138 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      contact_messages: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          message: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          message: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      earnings: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          platform: string
+          recorded_at: string
+          surge_multiplier: number | null
+          trip_distance_km: number | null
+          trip_duration_min: number | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          platform: string
+          recorded_at?: string
+          surge_multiplier?: number | null
+          trip_distance_km?: number | null
+          trip_duration_min?: number | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          platform?: string
+          recorded_at?: string
+          surge_multiplier?: number | null
+          trip_distance_km?: number | null
+          trip_duration_min?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          city: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          onboarding_completed: boolean | null
+          preferred_platforms: string[] | null
+          stripe_customer_id: string | null
+          subscription_tier: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          city?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          onboarding_completed?: boolean | null
+          preferred_platforms?: string[] | null
+          stripe_customer_id?: string | null
+          subscription_tier?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          city?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          onboarding_completed?: boolean | null
+          preferred_platforms?: string[] | null
+          stripe_customer_id?: string | null
+          subscription_tier?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      surge_predictions: {
+        Row: {
+          area: string
+          city: string
+          confidence: number
+          created_at: string
+          id: string
+          platform: string | null
+          predicted_for: string
+          predicted_surge: number
+        }
+        Insert: {
+          area: string
+          city: string
+          confidence: number
+          created_at?: string
+          id?: string
+          platform?: string | null
+          predicted_for: string
+          predicted_surge: number
+        }
+        Update: {
+          area?: string
+          city?: string
+          confidence?: number
+          created_at?: string
+          id?: string
+          platform?: string | null
+          predicted_for?: string
+          predicted_surge?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
