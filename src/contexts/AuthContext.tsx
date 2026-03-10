@@ -69,31 +69,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        await fetchProfile(session.user.id);
-        await refreshSubscription();
-      } else {
-        setProfile(null);
-        setSubscribed(false);
-        setProductId(null);
-      }
-      setLoading(false);
-    });
+    let subscription: { unsubscribe: () => void } | null = null;
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProfile(session.user.id);
-        refreshSubscription();
-      }
-      setLoading(false);
-    });
+    const initializeAuth = async () => {
+      try {
+        // 1. Restore session from storage first
+        const { data: { session } } = await supabase.auth.getSession();
+        setSession(session);
+        setUser(session?.user ?? null);
+        if (session?.user) {
+          await fetchProfile(session.user.id);
+          await refreshSubscription();
+        }
 
-    return () => subscription.unsubscribe();
+        // 2. Set up listener AFTER initial session is resolved
+        const { data } = supabase.auth.onAuthStateChange(async (_event, session) => {
+          setSession(session);
+          setUser(session?.user ?? null);
+          if (session?.user) {
+            await fetchProfile(session.user.id);
+            await refreshSubscription();
+          } else {
+            setProfile(null);
+            setSubscribed(false);
+            setProductId(null);
+          }
+        });
+        subscription = data.subscription;
+      } catch (error) {
+        console.error("Auth initialization error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initializeAuth();
+
+    return () => subscription?.unsubscribe();
   }, []);
 
   // Refresh subscription every minute
