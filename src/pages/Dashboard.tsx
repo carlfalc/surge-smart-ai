@@ -281,6 +281,11 @@ const Dashboard = () => {
                 <Button variant="outline" onClick={handlePortal}>Manage Subscription in Stripe</Button>
               )}
             </div>
+          ) : activeTab === "settings" ? (
+            <div className="max-w-xl space-y-6">
+              <h2 className="text-xl font-display font-bold">Settings</h2>
+              <ProfileEditor />
+            </div>
           ) : activeTab === "earnings" ? (
             renderEarningsTab()
           ) : (
