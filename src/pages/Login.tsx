@@ -16,9 +16,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { user, profile: _loginProfile } = useAuth();
-
-  const { profile } = useAuth();
+  const { user, profile } = useAuth();
 
   useEffect(() => {
     if (user) {
