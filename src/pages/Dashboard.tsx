@@ -285,6 +285,38 @@ const Dashboard = () => {
           ) : activeTab === "settings" ? (
             <div className="max-w-xl space-y-6">
               <h2 className="text-xl font-display font-bold">Settings</h2>
+
+              {/* Gmail Sync Status */}
+              <div className="glass rounded-xl p-5 border border-border">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <Mail className="h-4 w-4 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">Gmail Earnings Sync</p>
+                      <p className="text-xs text-muted-foreground">
+                        {profile?.gmail_connected
+                          ? "Connected — earnings sync automatically"
+                          : "Not connected — using manual entry"}
+                      </p>
+                    </div>
+                  </div>
+                  <span
+                    className={`text-xs px-2.5 py-1 rounded-full font-medium ${
+                      profile?.gmail_connected
+                        ? "bg-accent/10 text-accent"
+                        : "bg-muted text-muted-foreground"
+                    }`}
+                  >
+                    {profile?.gmail_connected ? "Connected" : "Disconnected"}
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-3 italic">
+                  Gmail auto-sync coming soon.
+                </p>
+              </div>
+
               <ProfileEditor />
             </div>
           ) : activeTab === "earnings" ? (
