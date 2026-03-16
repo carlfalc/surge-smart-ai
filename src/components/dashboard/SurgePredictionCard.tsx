@@ -32,6 +32,10 @@ export function SurgePredictionCard() {
   const fetchSurgePredictions = useCallback(async () => {
     setLoading(true);
     try {
+      const weatherContext = weather
+        ? `Current weather in ${city}: ${weather.description}, ${weather.temperature}°C, wind ${weather.windspeed}km/h, rainfall ${weather.rainfall}mm. Weather surge impact: ${weather.surgeImpact}.`
+        : "";
+
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
@@ -42,10 +46,6 @@ export function SurgePredictionCard() {
           Authorization: `Bearer ${supabaseKey}`,
           apikey: supabaseKey,
         },
-        const weatherContext = weather
-          ? `Current weather in ${city}: ${weather.description}, ${weather.temperature}°C, wind ${weather.windspeed}km/h, rainfall ${weather.rainfall}mm. Weather surge impact: ${weather.surgeImpact}.`
-          : "";
-
         body: JSON.stringify({
           messages: [
             {
