@@ -88,8 +88,16 @@ Include 4 areas. Base predictions on current time of day and typical ${city} pat
       const jsonMatch = accumulated.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         const parsed: SurgeData = JSON.parse(jsonMatch[0]);
-        setSurgeData(parsed);
-        setLastUpdated(new Date());
+        // Filter out malformed areas
+        if (parsed.areas) {
+          parsed.areas = parsed.areas.filter(
+            (a) => a.area && typeof a.area === "string" && a.area.length > 1
+          );
+        }
+        if (parsed.areas?.length) {
+          setSurgeData(parsed);
+          setLastUpdated(new Date());
+        }
       }
     } catch (err) {
       console.error("Surge fetch error:", err);
@@ -104,8 +112,10 @@ Include 4 areas. Base predictions on current time of day and typical ${city} pat
     return () => clearInterval(interval);
   }, [fetchSurgePredictions]);
 
-  const getMultiplierColor = (multiplier: string) => {
-    const val = parseFloat(multiplier.replace("x", ""));
+  const getMultiplierColor = (multiplier: string | undefined) => {
+    if (!multiplier) return "bg-primary text-primary-foreground";
+    const val = parseFloat(String(multiplier).replace("x", ""));
+    if (isNaN(val)) return "bg-primary text-primary-foreground";
     if (val >= 2.0) return "bg-destructive text-destructive-foreground";
     if (val >= 1.5) return "bg-accent text-accent-foreground";
     return "bg-primary text-primary-foreground";
@@ -161,7 +171,7 @@ Include 4 areas. Base predictions on current time of day and typical ${city} pat
                   }`}
                 >
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium">{area.area}</span>
+                    <span className="text-sm font-medium">{area.area || "Unknown"}</span>
                     {area.area === surgeData.best_area && (
                       <span className="text-[10px] bg-accent/20 text-accent px-2 py-0.5 rounded-full font-semibold">
                         BEST
@@ -170,9 +180,9 @@ Include 4 areas. Base predictions on current time of day and typical ${city} pat
                   </div>
                   <div className="flex items-center gap-2">
                     <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${getMultiplierColor(area.multiplier)}`}>
-                      {area.multiplier}
+                      {area.multiplier || "N/A"}
                     </span>
-                    <Badge variant={getConfidenceVariant(area.confidence)}>{area.confidence}</Badge>
+                    <Badge variant={getConfidenceVariant(area.confidence)}>{area.confidence || "?"}</Badge>
                   </div>
                 </div>
               ))}
