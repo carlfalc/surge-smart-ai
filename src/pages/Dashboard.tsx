@@ -8,9 +8,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAuth, TIERS } from "@/contexts/AuthContext";
 import { SurgePredictionCard } from "@/components/dashboard/SurgePredictionCard";
+import { TripLogger } from "@/components/dashboard/TripLogger";
+import { useEarningsStats } from "@/hooks/useEarningsStats";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Link } from "react-router-dom";
+import {
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+} from "@/components/ui/table";
 
 const navItems = [
   { icon: BarChart3, label: "Dashboard", id: "dashboard" },
@@ -37,15 +41,45 @@ const StatCard = ({ label, value, change, positive }: { label: string; value: st
   </div>
 );
 
+interface TripRow {
+  id: string;
+  platform: string;
+  amount: number;
+  trip_distance_km: number | null;
+  trip_duration_min: number | null;
+  created_at: string;
+}
+
 const Dashboard = () => {
   const { user, profile, loading, subscribed, productId, signOut } = useAuth();
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [todayTrips, setTodayTrips] = useState<TripRow[]>([]);
+
+  const stats = useEarningsStats(refreshKey);
 
   useEffect(() => {
     if (!loading && !user) navigate("/login");
   }, [loading, user, navigate]);
+
+  // Fetch today's trips for the earnings tab
+  useEffect(() => {
+    if (!user) return;
+    const fetchTrips = async () => {
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      const { data } = await supabase
+        .from("earnings")
+        .select("id, platform, amount, trip_distance_km, trip_duration_min, created_at")
+        .eq("user_id", user.id)
+        .gte("created_at", todayStart.toISOString())
+        .order("created_at", { ascending: false });
+      setTodayTrips((data as TripRow[]) || []);
+    };
+    fetchTrips();
+  }, [user, refreshKey]);
 
   const handleCheckout = async (priceId: string) => {
     try {
@@ -78,6 +112,45 @@ const Dashboard = () => {
       </div>
     );
   }
+
+  const renderEarningsTab = () => (
+    <div className="space-y-6">
+      <TripLogger onTripAdded={() => setRefreshKey((k) => k + 1)} />
+
+      <div className="glass rounded-2xl p-6">
+        <h3 className="font-display font-semibold mb-4 flex items-center gap-2">
+          <DollarSign className="h-4 w-4 text-accent" />
+          Today's Trips
+        </h3>
+        {todayTrips.length === 0 ? (
+          <p className="text-sm text-muted-foreground py-4 text-center">No trips logged today yet.</p>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="text-xs">Platform</TableHead>
+                <TableHead className="text-xs">Amount</TableHead>
+                <TableHead className="text-xs">Distance</TableHead>
+                <TableHead className="text-xs">Duration</TableHead>
+                <TableHead className="text-xs">Time</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {todayTrips.map((trip) => (
+                <TableRow key={trip.id}>
+                  <TableCell className="text-sm font-medium">{trip.platform}</TableCell>
+                  <TableCell className="text-sm text-accent font-semibold">${trip.amount.toFixed(2)}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">{trip.trip_distance_km ? `${trip.trip_distance_km} km` : "—"}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">{trip.trip_duration_min ? `${trip.trip_duration_min} min` : "—"}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">{new Date(trip.created_at).toLocaleTimeString()}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </div>
+    </div>
+  );
 
   return (
     <div className="dark min-h-screen bg-background text-foreground flex">
@@ -204,19 +277,40 @@ const Dashboard = () => {
                 <Button variant="outline" onClick={handlePortal}>Manage Subscription in Stripe</Button>
               )}
             </div>
+          ) : activeTab === "earnings" ? (
+            renderEarningsTab()
           ) : (
             <>
-              {/* Stats */}
+              {/* Stats — real data */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                <StatCard label="Today's Earnings" value="$187.40" change="↑ 12% vs avg" positive />
-                <StatCard label="Active Hours" value="6.2h" change="On track" positive />
-                <StatCard label="Trips Completed" value="14" change="↑ 3 vs yesterday" positive />
-                <StatCard label="Avg Surge" value="1.6x" change="↑ 0.3x higher" positive />
+                <StatCard
+                  label="Today's Earnings"
+                  value={stats.loading ? "—" : `$${stats.todayEarnings.toFixed(2)}`}
+                  change={stats.todayTrips > 0 ? `${stats.todayTrips} trip${stats.todayTrips !== 1 ? "s" : ""} today` : "No trips yet"}
+                  positive={stats.todayTrips > 0}
+                />
+                <StatCard
+                  label="Active Hours"
+                  value={stats.loading ? "—" : `${stats.todayHours}h`}
+                  change={stats.todayHours > 0 ? "Tracked from trips" : "Log trips to track"}
+                  positive={stats.todayHours > 0}
+                />
+                <StatCard
+                  label="Trips Completed"
+                  value={stats.loading ? "—" : `${stats.todayTrips}`}
+                  change={stats.todayTrips > 0 ? "Today so far" : "Start logging"}
+                  positive={stats.todayTrips > 0}
+                />
+                <StatCard
+                  label="Avg Surge"
+                  value={stats.loading ? "—" : `${stats.avgSurge}x`}
+                  change={stats.avgSurge > 1 ? "Above base rate" : "Base rate"}
+                  positive={stats.avgSurge > 1}
+                />
               </div>
 
               {/* Content grid */}
               <div className="grid lg:grid-cols-2 gap-6">
-                {/* Surge prediction — live AI */}
                 <SurgePredictionCard />
 
                 {/* Platform comparison */}
