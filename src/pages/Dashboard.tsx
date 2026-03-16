@@ -10,6 +10,8 @@ import { useAuth, TIERS } from "@/contexts/AuthContext";
 import { SurgePredictionCard } from "@/components/dashboard/SurgePredictionCard";
 import { TripLogger } from "@/components/dashboard/TripLogger";
 import { PlatformComparison } from "@/components/dashboard/PlatformComparison";
+import { ProfileEditor } from "@/components/dashboard/ProfileEditor";
+import { Progress } from "@/components/ui/progress";
 import { useEarningsStats } from "@/hooks/useEarningsStats";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -34,11 +36,12 @@ const bottomNav = [
   { icon: HelpCircle, label: "Help", id: "help", link: "/help" },
 ];
 
-const StatCard = ({ label, value, change, positive }: { label: string; value: string; change: string; positive: boolean }) => (
+const StatCard = ({ label, value, change, positive, children }: { label: string; value: string; change: string; positive: boolean; children?: React.ReactNode }) => (
   <div className="glass rounded-xl p-4">
     <p className="text-xs text-muted-foreground mb-1">{label}</p>
     <p className="text-2xl font-display font-bold">{value}</p>
     <p className={`text-xs mt-1 ${positive ? "text-accent" : "text-destructive"}`}>{change}</p>
+    {children}
   </div>
 );
 
@@ -278,6 +281,11 @@ const Dashboard = () => {
                 <Button variant="outline" onClick={handlePortal}>Manage Subscription in Stripe</Button>
               )}
             </div>
+          ) : activeTab === "settings" ? (
+            <div className="max-w-xl space-y-6">
+              <h2 className="text-xl font-display font-bold">Settings</h2>
+              <ProfileEditor />
+            </div>
           ) : activeTab === "earnings" ? (
             renderEarningsTab()
           ) : (
@@ -289,7 +297,19 @@ const Dashboard = () => {
                   value={stats.loading ? "—" : `$${stats.todayEarnings.toFixed(2)}`}
                   change={stats.todayTrips > 0 ? `${stats.todayTrips} trip${stats.todayTrips !== 1 ? "s" : ""} today` : "No trips yet"}
                   positive={stats.todayTrips > 0}
-                />
+                >
+                  {profile?.earnings_goal && !stats.loading && (
+                    <div className="mt-2">
+                      <Progress
+                        value={Math.min((stats.todayEarnings / profile.earnings_goal) * 100, 100)}
+                        className="h-2"
+                      />
+                      <p className="text-[10px] text-muted-foreground mt-1">
+                        {Math.round((stats.todayEarnings / profile.earnings_goal) * 100)}% of ${profile.earnings_goal} goal
+                      </p>
+                    </div>
+                  )}
+                </StatCard>
                 <StatCard
                   label="Active Hours"
                   value={stats.loading ? "—" : `${stats.todayHours}h`}
