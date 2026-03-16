@@ -297,7 +297,19 @@ const Dashboard = () => {
                   value={stats.loading ? "—" : `$${stats.todayEarnings.toFixed(2)}`}
                   change={stats.todayTrips > 0 ? `${stats.todayTrips} trip${stats.todayTrips !== 1 ? "s" : ""} today` : "No trips yet"}
                   positive={stats.todayTrips > 0}
-                />
+                >
+                  {profile?.earnings_goal && !stats.loading && (
+                    <div className="mt-2">
+                      <Progress
+                        value={Math.min((stats.todayEarnings / profile.earnings_goal) * 100, 100)}
+                        className="h-2"
+                      />
+                      <p className="text-[10px] text-muted-foreground mt-1">
+                        {Math.round((stats.todayEarnings / profile.earnings_goal) * 100)}% of ${profile.earnings_goal} goal
+                      </p>
+                    </div>
+                  )}
+                </StatCard>
                 <StatCard
                   label="Active Hours"
                   value={stats.loading ? "—" : `${stats.todayHours}h`}
