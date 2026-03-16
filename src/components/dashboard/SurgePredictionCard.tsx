@@ -27,6 +27,7 @@ export function SurgePredictionCard() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const city = profile?.city || "Auckland";
+  const { weather } = useWeather(city);
 
   const fetchSurgePredictions = useCallback(async () => {
     setLoading(true);
