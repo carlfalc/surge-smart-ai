@@ -66,7 +66,8 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (!loading && !user) navigate("/login");
-  }, [loading, user, navigate]);
+    if (!loading && user && profile && !profile.onboarding_completed) navigate("/onboarding");
+  }, [loading, user, profile, navigate]);
 
   // Fetch today's trips for the earnings tab
   useEffect(() => {
