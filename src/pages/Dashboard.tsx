@@ -314,36 +314,7 @@ const Dashboard = () => {
               <div className="grid lg:grid-cols-2 gap-6">
                 <SurgePredictionCard />
 
-                {/* Platform comparison */}
-                <div className="glass rounded-2xl p-6">
-                  <h3 className="font-display font-semibold mb-4 flex items-center gap-2">
-                    <DollarSign className="h-4 w-4 text-accent" />
-                    Platform Rates — Right Now
-                  </h3>
-                  <div className="space-y-3">
-                    {[
-                      { platform: "Uber", base: "$14.20", surge: "1.8x", total: "$25.56", best: false },
-                      { platform: "Lyft", base: "$15.10", surge: "2.1x", total: "$31.71", best: true },
-                      { platform: "Ola", base: "$12.80", surge: "1.5x", total: "$19.20", best: false },
-                    ].map((p) => (
-                      <div
-                        key={p.platform}
-                        className={`flex items-center justify-between rounded-lg px-4 py-3 ${
-                          p.best ? "bg-accent/10 border border-accent/30" : "bg-muted/30"
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className="text-sm font-medium w-12">{p.platform}</span>
-                          <span className="text-xs text-muted-foreground">{p.base} × {p.surge}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {p.best && <span className="text-[10px] bg-accent/20 text-accent px-2 py-0.5 rounded-full font-semibold">BEST</span>}
-                          <span className={`text-sm font-bold ${p.best ? "text-accent" : ""}`}>{p.total}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <PlatformComparison />
 
                 {/* Heat map */}
                 <div className="glass rounded-2xl p-6">
