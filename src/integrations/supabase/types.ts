@@ -80,6 +80,7 @@ export type Database = {
           created_at: string
           earnings_goal: number | null
           full_name: string | null
+          gmail_connected: boolean | null
           id: string
           onboarding_completed: boolean | null
           preferred_platforms: string[] | null
@@ -93,6 +94,7 @@ export type Database = {
           created_at?: string
           earnings_goal?: number | null
           full_name?: string | null
+          gmail_connected?: boolean | null
           id?: string
           onboarding_completed?: boolean | null
           preferred_platforms?: string[] | null
@@ -106,6 +108,7 @@ export type Database = {
           created_at?: string
           earnings_goal?: number | null
           full_name?: string | null
+          gmail_connected?: boolean | null
           id?: string
           onboarding_completed?: boolean | null
           preferred_platforms?: string[] | null

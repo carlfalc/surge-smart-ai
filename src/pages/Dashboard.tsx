@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { 
   TrendingUp, Map, Clock, Zap, DollarSign, Settings, HelpCircle, 
-  ChevronLeft, ChevronRight, Bell, Fuel, BarChart3, Navigation, LogOut, CreditCard
+  ChevronLeft, ChevronRight, Bell, Fuel, BarChart3, Navigation, LogOut, CreditCard, Mail
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth, TIERS } from "@/contexts/AuthContext";
@@ -66,7 +66,8 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (!loading && !user) navigate("/login");
-  }, [loading, user, navigate]);
+    if (!loading && user && profile && !profile.onboarding_completed) navigate("/onboarding");
+  }, [loading, user, profile, navigate]);
 
   // Fetch today's trips for the earnings tab
   useEffect(() => {
@@ -284,6 +285,38 @@ const Dashboard = () => {
           ) : activeTab === "settings" ? (
             <div className="max-w-xl space-y-6">
               <h2 className="text-xl font-display font-bold">Settings</h2>
+
+              {/* Gmail Sync Status */}
+              <div className="glass rounded-xl p-5 border border-border">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <Mail className="h-4 w-4 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">Gmail Earnings Sync</p>
+                      <p className="text-xs text-muted-foreground">
+                        {profile?.gmail_connected
+                          ? "Connected — earnings sync automatically"
+                          : "Not connected — using manual entry"}
+                      </p>
+                    </div>
+                  </div>
+                  <span
+                    className={`text-xs px-2.5 py-1 rounded-full font-medium ${
+                      profile?.gmail_connected
+                        ? "bg-accent/10 text-accent"
+                        : "bg-muted text-muted-foreground"
+                    }`}
+                  >
+                    {profile?.gmail_connected ? "Connected" : "Disconnected"}
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-3 italic">
+                  Gmail auto-sync coming soon.
+                </p>
+              </div>
+
               <ProfileEditor />
             </div>
           ) : activeTab === "earnings" ? (
