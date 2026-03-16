@@ -163,7 +163,7 @@ Include 4 areas. Base predictions on current time of day and typical ${city} pat
                   }`}
                 >
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium">{area.area}</span>
+                    <span className="text-sm font-medium">{area.area || "Unknown"}</span>
                     {area.area === surgeData.best_area && (
                       <span className="text-[10px] bg-accent/20 text-accent px-2 py-0.5 rounded-full font-semibold">
                         BEST
@@ -172,9 +172,9 @@ Include 4 areas. Base predictions on current time of day and typical ${city} pat
                   </div>
                   <div className="flex items-center gap-2">
                     <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${getMultiplierColor(area.multiplier)}`}>
-                      {area.multiplier}
+                      {area.multiplier || "N/A"}
                     </span>
-                    <Badge variant={getConfidenceVariant(area.confidence)}>{area.confidence}</Badge>
+                    <Badge variant={getConfidenceVariant(area.confidence)}>{area.confidence || "?"}</Badge>
                   </div>
                 </div>
               ))}
