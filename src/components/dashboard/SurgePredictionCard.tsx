@@ -104,8 +104,10 @@ Include 4 areas. Base predictions on current time of day and typical ${city} pat
     return () => clearInterval(interval);
   }, [fetchSurgePredictions]);
 
-  const getMultiplierColor = (multiplier: string) => {
-    const val = parseFloat(multiplier.replace("x", ""));
+  const getMultiplierColor = (multiplier: string | undefined) => {
+    if (!multiplier) return "bg-primary text-primary-foreground";
+    const val = parseFloat(String(multiplier).replace("x", ""));
+    if (isNaN(val)) return "bg-primary text-primary-foreground";
     if (val >= 2.0) return "bg-destructive text-destructive-foreground";
     if (val >= 1.5) return "bg-accent text-accent-foreground";
     return "bg-primary text-primary-foreground";
