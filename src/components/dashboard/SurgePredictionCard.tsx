@@ -42,11 +42,15 @@ export function SurgePredictionCard() {
           Authorization: `Bearer ${supabaseKey}`,
           apikey: supabaseKey,
         },
+        const weatherContext = weather
+          ? `Current weather in ${city}: ${weather.description}, ${weather.temperature}°C, wind ${weather.windspeed}km/h, rainfall ${weather.rainfall}mm. Weather surge impact: ${weather.surgeImpact}.`
+          : "";
+
         body: JSON.stringify({
           messages: [
             {
               role: "user",
-              content: `Give me current surge pricing predictions for rideshare drivers in ${city}. Return a JSON object with this exact structure:
+              content: `${weatherContext} Give me current surge pricing predictions for rideshare drivers in ${city}. Return a JSON object with this exact structure:
 {
   "areas": [
     { "area": "Area Name", "multiplier": "1.8x", "confidence": "High", "tip": "short tip" }
@@ -54,7 +58,7 @@ export function SurgePredictionCard() {
   "summary": "one sentence market summary",
   "best_area": "Best Area Name"
 }
-Include 4 areas. Base predictions on current time of day and typical ${city} patterns. Return ONLY valid JSON, no markdown.`,
+Include 4 areas. Base predictions on current time of day, weather conditions, and typical ${city} patterns. Return ONLY valid JSON, no markdown.`,
             },
           ],
           type: "surge",
