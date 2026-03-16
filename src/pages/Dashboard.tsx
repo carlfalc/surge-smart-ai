@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth, TIERS } from "@/contexts/AuthContext";
 import { SurgePredictionCard } from "@/components/dashboard/SurgePredictionCard";
 import { TripLogger } from "@/components/dashboard/TripLogger";
+import { PlatformComparison } from "@/components/dashboard/PlatformComparison";
 import { useEarningsStats } from "@/hooks/useEarningsStats";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
