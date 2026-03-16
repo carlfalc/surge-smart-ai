@@ -148,7 +148,19 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      platform_rates: {
+        Row: {
+          avg_per_hour: number | null
+          avg_per_km: number | null
+          avg_surge: number | null
+          avg_trip_value: number | null
+          city: string | null
+          last_updated: string | null
+          platform: string | null
+          trip_count: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
