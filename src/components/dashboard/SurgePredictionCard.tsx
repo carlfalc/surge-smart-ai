@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { TrendingUp, RefreshCw, MapPin } from "lucide-react";
+import { useWeather } from "@/hooks/useWeather";
+import { WeatherBadge } from "@/components/dashboard/WeatherBadge";
 
 interface SurgeArea {
   area: string;
@@ -25,10 +27,15 @@ export function SurgePredictionCard() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const city = profile?.city || "Auckland";
+  const { weather } = useWeather(city);
 
   const fetchSurgePredictions = useCallback(async () => {
     setLoading(true);
     try {
+      const weatherContext = weather
+        ? `Current weather in ${city}: ${weather.description}, ${weather.temperature}°C, wind ${weather.windspeed}km/h, rainfall ${weather.rainfall}mm. Weather surge impact: ${weather.surgeImpact}.`
+        : "";
+
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
@@ -43,7 +50,7 @@ export function SurgePredictionCard() {
           messages: [
             {
               role: "user",
-              content: `Give me current surge pricing predictions for rideshare drivers in ${city}. Return a JSON object with this exact structure:
+              content: `${weatherContext} Give me current surge pricing predictions for rideshare drivers in ${city}. Return a JSON object with this exact structure:
 {
   "areas": [
     { "area": "Area Name", "multiplier": "1.8x", "confidence": "High", "tip": "short tip" }
@@ -51,7 +58,7 @@ export function SurgePredictionCard() {
   "summary": "one sentence market summary",
   "best_area": "Best Area Name"
 }
-Include 4 areas. Base predictions on current time of day and typical ${city} patterns. Return ONLY valid JSON, no markdown.`,
+Include 4 areas. Base predictions on current time of day, weather conditions, and typical ${city} patterns. Return ONLY valid JSON, no markdown.`,
             },
           ],
           type: "surge",
@@ -104,7 +111,7 @@ Include 4 areas. Base predictions on current time of day and typical ${city} pat
     } finally {
       setLoading(false);
     }
-  }, [city]);
+  }, [city, weather]);
 
   useEffect(() => {
     fetchSurgePredictions();
@@ -129,25 +136,28 @@ Include 4 areas. Base predictions on current time of day and typical ${city} pat
 
   return (
     <Card className="glass border-0 rounded-2xl">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="font-display font-semibold text-base flex items-center gap-2">
-          <TrendingUp className="h-4 w-4 text-primary" />
-          Live Surge Predictions
-          <span className="text-xs text-muted-foreground font-normal flex items-center gap-1">
-            <MapPin className="h-3 w-3" />
-            {city}
-          </span>
-        </CardTitle>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={fetchSurgePredictions}
-          disabled={loading}
-          className="text-xs"
-        >
-          <RefreshCw className={`h-3 w-3 mr-1 ${loading ? "animate-spin" : ""}`} />
-          {loading ? "Updating…" : "Refresh"}
-        </Button>
+      <CardHeader className="pb-2 space-y-2">
+        <div className="flex items-center justify-between">
+          <CardTitle className="font-display font-semibold text-base flex items-center gap-2">
+            <TrendingUp className="h-4 w-4 text-primary" />
+            Live Surge Predictions
+            <span className="text-xs text-muted-foreground font-normal flex items-center gap-1">
+              <MapPin className="h-3 w-3" />
+              {city}
+            </span>
+          </CardTitle>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={fetchSurgePredictions}
+            disabled={loading}
+            className="text-xs"
+          >
+            <RefreshCw className={`h-3 w-3 mr-1 ${loading ? "animate-spin" : ""}`} />
+            {loading ? "Updating…" : "Refresh"}
+          </Button>
+        </div>
+        <WeatherBadge city={city} />
       </CardHeader>
       <CardContent className="space-y-3">
         {loading && !surgeData && (
