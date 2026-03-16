@@ -18,9 +18,17 @@ const Login = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
+  const { profile } = useAuth();
+
   useEffect(() => {
-    if (user) navigate("/dashboard");
-  }, [user, navigate]);
+    if (user) {
+      if (profile && !profile.onboarding_completed) {
+        navigate("/onboarding");
+      } else if (profile) {
+        navigate("/dashboard");
+      }
+    }
+  }, [user, profile, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
