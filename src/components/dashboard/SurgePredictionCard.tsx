@@ -111,7 +111,7 @@ Include 4 areas. Base predictions on current time of day, weather conditions, an
     } finally {
       setLoading(false);
     }
-  }, [city]);
+  }, [city, weather]);
 
   useEffect(() => {
     fetchSurgePredictions();
