@@ -216,32 +216,8 @@ const Dashboard = () => {
 
               {/* Content grid */}
               <div className="grid lg:grid-cols-2 gap-6">
-                {/* Surge prediction */}
-                <div className="glass rounded-2xl p-6">
-                  <h3 className="font-display font-semibold mb-4 flex items-center gap-2">
-                    <TrendingUp className="h-4 w-4 text-primary" />
-                    Surge Prediction — Next 2 Hours
-                  </h3>
-                  <div className="space-y-3">
-                    {[
-                      { time: "Now", area: "CBD", surge: "1.8x", confidence: "92%" },
-                      { time: "+30m", area: "Airport", surge: "2.4x", confidence: "87%" },
-                      { time: "+60m", area: "Suburbs East", surge: "1.5x", confidence: "78%" },
-                      { time: "+90m", area: "Entertainment District", surge: "3.1x", confidence: "71%" },
-                    ].map((pred) => (
-                      <div key={pred.time} className="flex items-center justify-between bg-muted/30 rounded-lg px-4 py-3">
-                        <div className="flex items-center gap-3">
-                          <span className="text-xs text-muted-foreground w-10">{pred.time}</span>
-                          <span className="text-sm font-medium">{pred.area}</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <span className="text-xs text-muted-foreground">{pred.confidence}</span>
-                          <span className="text-sm font-bold text-accent">{pred.surge}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                {/* Surge prediction — live AI */}
+                <SurgePredictionCard />
 
                 {/* Platform comparison */}
                 <div className="glass rounded-2xl p-6">
