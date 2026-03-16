@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { TrendingUp, RefreshCw, MapPin } from "lucide-react";
+import { useWeather } from "@/hooks/useWeather";
+import { WeatherBadge } from "@/components/dashboard/WeatherBadge";
 
 interface SurgeArea {
   area: string;
