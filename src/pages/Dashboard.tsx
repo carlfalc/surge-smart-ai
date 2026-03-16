@@ -10,6 +10,8 @@ import { useAuth, TIERS } from "@/contexts/AuthContext";
 import { SurgePredictionCard } from "@/components/dashboard/SurgePredictionCard";
 import { TripLogger } from "@/components/dashboard/TripLogger";
 import { PlatformComparison } from "@/components/dashboard/PlatformComparison";
+import { ProfileEditor } from "@/components/dashboard/ProfileEditor";
+import { Progress } from "@/components/ui/progress";
 import { useEarningsStats } from "@/hooks/useEarningsStats";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
