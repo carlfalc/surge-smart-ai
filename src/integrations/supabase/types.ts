@@ -78,6 +78,7 @@ export type Database = {
         Row: {
           city: string | null
           created_at: string
+          earnings_goal: number | null
           full_name: string | null
           id: string
           onboarding_completed: boolean | null
@@ -90,6 +91,7 @@ export type Database = {
         Insert: {
           city?: string | null
           created_at?: string
+          earnings_goal?: number | null
           full_name?: string | null
           id?: string
           onboarding_completed?: boolean | null
@@ -102,6 +104,7 @@ export type Database = {
         Update: {
           city?: string | null
           created_at?: string
+          earnings_goal?: number | null
           full_name?: string | null
           id?: string
           onboarding_completed?: boolean | null
