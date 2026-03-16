@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth, TIERS } from "@/contexts/AuthContext";
+import { SurgePredictionCard } from "@/components/dashboard/SurgePredictionCard";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
