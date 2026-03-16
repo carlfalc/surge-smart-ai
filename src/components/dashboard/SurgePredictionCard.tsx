@@ -88,8 +88,16 @@ Include 4 areas. Base predictions on current time of day and typical ${city} pat
       const jsonMatch = accumulated.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         const parsed: SurgeData = JSON.parse(jsonMatch[0]);
-        setSurgeData(parsed);
-        setLastUpdated(new Date());
+        // Filter out malformed areas
+        if (parsed.areas) {
+          parsed.areas = parsed.areas.filter(
+            (a) => a.area && typeof a.area === "string" && a.area.length > 1
+          );
+        }
+        if (parsed.areas?.length) {
+          setSurgeData(parsed);
+          setLastUpdated(new Date());
+        }
       }
     } catch (err) {
       console.error("Surge fetch error:", err);
