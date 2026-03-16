@@ -136,25 +136,28 @@ Include 4 areas. Base predictions on current time of day, weather conditions, an
 
   return (
     <Card className="glass border-0 rounded-2xl">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="font-display font-semibold text-base flex items-center gap-2">
-          <TrendingUp className="h-4 w-4 text-primary" />
-          Live Surge Predictions
-          <span className="text-xs text-muted-foreground font-normal flex items-center gap-1">
-            <MapPin className="h-3 w-3" />
-            {city}
-          </span>
-        </CardTitle>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={fetchSurgePredictions}
-          disabled={loading}
-          className="text-xs"
-        >
-          <RefreshCw className={`h-3 w-3 mr-1 ${loading ? "animate-spin" : ""}`} />
-          {loading ? "Updating…" : "Refresh"}
-        </Button>
+      <CardHeader className="pb-2 space-y-2">
+        <div className="flex items-center justify-between">
+          <CardTitle className="font-display font-semibold text-base flex items-center gap-2">
+            <TrendingUp className="h-4 w-4 text-primary" />
+            Live Surge Predictions
+            <span className="text-xs text-muted-foreground font-normal flex items-center gap-1">
+              <MapPin className="h-3 w-3" />
+              {city}
+            </span>
+          </CardTitle>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={fetchSurgePredictions}
+            disabled={loading}
+            className="text-xs"
+          >
+            <RefreshCw className={`h-3 w-3 mr-1 ${loading ? "animate-spin" : ""}`} />
+            {loading ? "Updating…" : "Refresh"}
+          </Button>
+        </div>
+        <WeatherBadge city={city} />
       </CardHeader>
       <CardContent className="space-y-3">
         {loading && !surgeData && (
