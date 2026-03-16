@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { 
   TrendingUp, Map, Clock, Zap, DollarSign, Settings, HelpCircle, 
-  ChevronLeft, ChevronRight, Bell, Fuel, BarChart3, Navigation, LogOut, CreditCard
+  ChevronLeft, ChevronRight, Bell, Fuel, BarChart3, Navigation, LogOut, CreditCard, Mail
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth, TIERS } from "@/contexts/AuthContext";
