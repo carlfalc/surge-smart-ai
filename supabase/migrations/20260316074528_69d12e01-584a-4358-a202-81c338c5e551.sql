@@ -1,0 +1,1 @@
+ALTER VIEW public.platform_rates SET (security_invoker = on);
