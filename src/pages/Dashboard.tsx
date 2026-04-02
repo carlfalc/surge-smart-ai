@@ -13,6 +13,7 @@ import { PlatformComparison } from "@/components/dashboard/PlatformComparison";
 import { ProfileEditor } from "@/components/dashboard/ProfileEditor";
 import { ExpenseLogger } from "@/components/dashboard/ExpenseLogger";
 import { TaxSummary } from "@/components/dashboard/TaxSummary";
+import { HeatMap } from "@/components/dashboard/HeatMap";
 import { Progress } from "@/components/ui/progress";
 import { useEarningsStats } from "@/hooks/useEarningsStats";
 import { supabase } from "@/integrations/supabase/client";
