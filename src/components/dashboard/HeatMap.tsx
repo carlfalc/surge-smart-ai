@@ -34,6 +34,17 @@ export function HeatMap() {
   const { zones, loading, refresh } = useHeatMap(city);
   const center = getCityCenter(city);
 
+  useEffect(() => {
+    // Fix Leaflet default icon paths in Vite
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    delete (L.Icon.Default.prototype as any)._getIconUrl;
+    L.Icon.Default.mergeOptions({
+      iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+      iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+      shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+    });
+  }, []);
+
   return (
     <div className="space-y-4">
       {/* Controls */}
