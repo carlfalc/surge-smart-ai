@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { CheckCircle, PenLine, ChevronRight, Car, Zap } from "lucide-react";
+import { CheckCircle, PenLine, ChevronRight, Car, Zap, FileText } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const PLATFORMS = ["Uber", "Ola", "DiDi", "Lyft", "InDriver", "Bolt"];
