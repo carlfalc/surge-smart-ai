@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { CheckCircle, Mail, PenLine, ChevronRight, Car, Zap } from "lucide-react";
+import { CheckCircle, PenLine, ChevronRight, Car, Zap } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const PLATFORMS = ["Uber", "Ola", "DiDi", "Lyft", "InDriver", "Bolt"];
@@ -36,10 +36,8 @@ const STEPS = [
 export default function Onboarding() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const [step, setStep] = useState(1);
   const [saving, setSaving] = useState(false);
-  const [gmailConnected, setGmailConnected] = useState(false);
   const [form, setForm] = useState({
     platforms: [] as string[],
     city: "",
@@ -49,14 +47,6 @@ export default function Onboarding() {
   useEffect(() => {
     if (!loading && !user) navigate("/login");
   }, [loading, user, navigate]);
-
-  // Check for gmail callback
-  useEffect(() => {
-    const stepParam = searchParams.get("step");
-    const gmailParam = searchParams.get("gmail");
-    if (stepParam) setStep(parseInt(stepParam));
-    if (gmailParam === "connected") setGmailConnected(true);
-  }, [searchParams]);
 
   const togglePlatform = (p: string) => {
     setForm((f) => ({
@@ -178,7 +168,7 @@ export default function Onboarding() {
                 <div className="space-y-3">
                   {[
                     { icon: "🎯", title: "Live Surge Predictions", desc: "Know where to be before the surge hits" },
-                    { icon: "💰", title: "Earnings Tracking", desc: "Automatic via Gmail or quick manual entry" },
+                    { icon: "💰", title: "Earnings Tracking", desc: "Quick manual entry — takes 5 seconds per trip" },
                     { icon: "📊", title: "Platform Comparison", desc: "See which app pays best right now" },
                   ].map((f) => (
                     <div key={f.title} className="flex items-start gap-3 bg-muted/30 rounded-xl p-4">
@@ -251,65 +241,29 @@ export default function Onboarding() {
               </div>
             )}
 
-            {/* Step 3 — Gmail / Earnings Sync */}
+            {/* Step 3 — Manual Trip Entry */}
             {step === 3 && (
               <div className="space-y-6">
                 <div>
-                  <h2 className="text-xl font-display font-bold">How should we track your earnings?</h2>
+                  <h2 className="text-xl font-display font-bold">How you'll track your earnings</h2>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Choose how TaxiFlow syncs your trip data.
+                    Simple, fast, and built into your dashboard.
                   </p>
                 </div>
 
-                {/* Gmail Option */}
-                <div className="border-2 border-primary/30 rounded-xl p-5 bg-primary/5">
+                <div className="border-2 border-primary/30 rounded-xl p-6 bg-primary/5">
                   <div className="flex items-start gap-4">
                     <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                      <Mail className="h-5 w-5 text-primary" />
+                      <PenLine className="h-5 w-5 text-primary" />
                     </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-semibold text-sm">Auto-sync via Gmail</h3>
-                        {gmailConnected && (
-                          <span className="text-[10px] bg-accent text-accent-foreground px-2 py-0.5 rounded-full">
-                            Connected
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        We read your trip receipt emails from {form.platforms.join(", ") || "your platforms"} and
-                        automatically log your earnings. No manual entry needed.
+                    <div className="flex-1 space-y-2">
+                      <h3 className="font-semibold">Manual Trip Entry</h3>
+                      <p className="text-sm text-muted-foreground">
+                        The fastest way to track your earnings — takes about 5 seconds per trip.
+                        Your platform is pre-selected so you just enter the fare amount.
                       </p>
-                      {!gmailConnected ? (
-                        <p className="text-xs text-muted-foreground mt-3 italic">
-                          Gmail auto-sync coming soon — use manual entry for now.
-                        </p>
-                      ) : (
-                        <p className="text-xs text-accent mt-3">
-                          ✅ Gmail connected — earnings will sync automatically!
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Manual Option */}
-                <div
-                  className="border-2 border-border rounded-xl p-5 hover:border-primary/30 transition-all cursor-pointer"
-                  onClick={() => setStep(4)}
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center shrink-0">
-                      <PenLine className="h-5 w-5 text-muted-foreground" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-sm">Manual entry</h3>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        No problem — you can log trips manually. It takes about 5 seconds
-                        per trip. Your platform is pre-selected so you just enter the amount.
-                      </p>
-                      <p className="text-xs text-muted-foreground/70 mt-2">
-                        💡 Tip: Keeping earnings updated helps surge predictions get smarter for you.
+                      <p className="text-sm text-muted-foreground/80 mt-3">
+                        💡 The more trips you log, the smarter your surge predictions get.
                       </p>
                     </div>
                   </div>
@@ -320,8 +274,7 @@ export default function Onboarding() {
                     Back
                   </Button>
                   <Button variant="hero" className="flex-1" onClick={() => setStep(4)}>
-                    {gmailConnected ? "Continue" : "Skip for now"}
-                    <ChevronRight className="ml-1 h-4 w-4" />
+                    Continue <ChevronRight className="ml-1 h-4 w-4" />
                   </Button>
                 </div>
               </div>
@@ -375,7 +328,7 @@ export default function Onboarding() {
                 <div className="bg-muted/30 rounded-xl p-4 space-y-1">
                   <p className="text-sm font-semibold mb-2">Your setup summary:</p>
                   <p className="text-xs text-muted-foreground">🚗 Platforms: {form.platforms.join(", ") || "None selected"}</p>
-                  <p className="text-xs text-muted-foreground">📧 Earnings sync: {gmailConnected ? "Gmail auto-sync ✅" : "Manual entry"}</p>
+                  <p className="text-xs text-muted-foreground">📧 Earnings sync: Manual entry</p>
                   <p className="text-xs text-muted-foreground">📍 City: {form.city || "Not set"}</p>
                   <p className="text-xs text-muted-foreground">🎯 Daily goal: {form.earnings_goal ? `$${form.earnings_goal}` : "Not set"}</p>
                 </div>
