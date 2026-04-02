@@ -11,6 +11,7 @@ interface AuthContextType {
   productId: string | null;
   signOut: () => Promise<void>;
   refreshSubscription: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -22,6 +23,7 @@ const AuthContext = createContext<AuthContextType>({
   productId: null,
   signOut: async () => {},
   refreshSubscription: async () => {},
+  refreshProfile: async () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -115,12 +117,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => clearInterval(interval);
   }, [user]);
 
+  const refreshProfile = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("user_id", user.id)
+      .single();
+    if (data) setProfile(data);
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
   };
 
   return (
-    <AuthContext.Provider value={{ session, user, profile, loading, subscribed, productId, signOut, refreshSubscription }}>
+    <AuthContext.Provider value={{ session, user, profile, loading, subscribed, productId, signOut, refreshSubscription, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );
