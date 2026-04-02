@@ -92,7 +92,9 @@ Each zone must have ACCURATE real-world coordinates for the named location. Use 
   "demand": number (0-100, based on time of day and venue type),
   "radius": number (metres, 200-800, larger for airports/districts),
   "type": "nightlife"|"transport"|"business"|"residential"|"shopping"|"stadium",
-  "reason": "short explanation of why demand is high/low right now"
+  "reason": "short explanation of why demand is high/low right now",
+  "pin_lat": number (precise latitude of the single best pickup hotspot within this zone — e.g. a specific intersection, train station entrance, or venue door),
+  "pin_lng": number (precise longitude of the best pickup hotspot)
 }
 
 Score demand realistically based on:
