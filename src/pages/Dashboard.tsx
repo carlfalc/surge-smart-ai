@@ -295,6 +295,8 @@ const Dashboard = () => {
             renderEarningsTab()
           ) : activeTab === "expenses" ? (
             <ExpenseLogger />
+          ) : activeTab === "tax" ? (
+            <TaxSummary />
           ) : (
             <>
               {/* Stats — real data */}
