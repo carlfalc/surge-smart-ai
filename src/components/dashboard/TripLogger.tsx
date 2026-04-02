@@ -52,7 +52,9 @@ export function TripLogger({ onTripAdded }: { onTripAdded: () => void }) {
         trip_distance_km: form.distance ? parseFloat(form.distance) : null,
         trip_duration_min: form.duration ? parseInt(form.duration) : null,
         surge_multiplier: form.surge_multiplier ? parseFloat(form.surge_multiplier) : 1.0,
-      });
+        trip_lat: geoCoords?.lat ?? null,
+        trip_lng: geoCoords?.lng ?? null,
+      } as any);
       if (error) throw error;
       toast.success(`Trip logged! $${form.amount} on ${form.platform}`);
       setForm({ platform: "", amount: "", distance: "", duration: "", surge_multiplier: "" });
