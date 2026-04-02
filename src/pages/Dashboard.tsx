@@ -396,64 +396,6 @@ const Dashboard = () => {
 
                 <PlatformComparison />
 
-                {/* Heat map */}
-                <div className="glass rounded-2xl p-6">
-                  <h3 className="font-display font-semibold mb-4 flex items-center gap-2">
-                    <Map className="h-4 w-4 text-primary" />
-                    Demand Heat Map
-                  </h3>
-                  <div className="aspect-video bg-muted/30 rounded-xl flex items-center justify-center relative overflow-hidden">
-                    <div className="absolute inset-0">
-                      {Array.from({ length: 8 }).map((_, i) => (
-                        <motion.div
-                          key={i}
-                          className="absolute rounded-full"
-                          style={{
-                            left: `${20 + Math.random() * 60}%`,
-                            top: `${20 + Math.random() * 60}%`,
-                            width: 30 + Math.random() * 40,
-                            height: 30 + Math.random() * 40,
-                            background: i < 3
-                              ? "radial-gradient(circle, hsl(150 100% 42% / 0.3), transparent)"
-                              : i < 6
-                              ? "radial-gradient(circle, hsl(220 100% 55% / 0.3), transparent)"
-                              : "radial-gradient(circle, hsl(40 100% 55% / 0.2), transparent)",
-                          }}
-                          animate={{ scale: [1, 1.3, 1], opacity: [0.5, 1, 0.5] }}
-                          transition={{ duration: 3 + i * 0.5, repeat: Infinity }}
-                        />
-                      ))}
-                    </div>
-                    <p className="text-xs text-muted-foreground relative z-10">Live demand visualization</p>
-                  </div>
-                </div>
-
-                {/* Shift recommendations */}
-                <div className="glass rounded-2xl p-6">
-                  <h3 className="font-display font-semibold mb-4 flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-primary" />
-                    AI Shift Recommendations
-                  </h3>
-                  <div className="space-y-3">
-                    {[
-                      { shift: "Morning Rush", time: "6:30 AM - 9:30 AM", est: "$95-120", score: 87 },
-                      { shift: "Lunch Hour", time: "11:30 AM - 1:30 PM", est: "$45-65", score: 62 },
-                      { shift: "Evening Peak", time: "5:00 PM - 8:00 PM", est: "$130-175", score: 94 },
-                      { shift: "Late Night", time: "10:00 PM - 1:00 AM", est: "$80-110", score: 78 },
-                    ].map((s) => (
-                      <div key={s.shift} className="flex items-center justify-between bg-muted/30 rounded-lg px-4 py-3">
-                        <div>
-                          <p className="text-sm font-medium">{s.shift}</p>
-                          <p className="text-xs text-muted-foreground">{s.time}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm font-semibold text-accent">{s.est}</p>
-                          <p className="text-xs text-muted-foreground">Score: {s.score}/100</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
               </div>
             </>
           )}
