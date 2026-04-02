@@ -11,6 +11,7 @@ interface AuthContextType {
   productId: string | null;
   signOut: () => Promise<void>;
   refreshSubscription: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
