@@ -44,11 +44,11 @@ const bottomNav = [
   { icon: HelpCircle, label: "Help", id: "help", link: "/help" },
 ];
 
-const StatCard = ({ label, value, change, positive, children }: { label: string; value: string; change: string; positive: boolean; children?: React.ReactNode }) => (
+const StatCard = ({ label, value, change, positive, neutral, children }: { label: string; value: string; change: string; positive: boolean; neutral?: boolean; children?: React.ReactNode }) => (
   <div className="glass rounded-xl p-4">
     <p className="text-xs text-muted-foreground mb-1">{label}</p>
     <p className="text-2xl font-display font-bold">{value}</p>
-    <p className={`text-xs mt-1 ${positive ? "text-accent" : "text-destructive"}`}>{change}</p>
+    <p className={`text-xs mt-1 ${neutral ? "text-muted-foreground" : positive ? "text-accent" : "text-destructive"}`}>{change}</p>
     {children}
   </div>
 );
