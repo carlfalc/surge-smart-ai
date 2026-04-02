@@ -20,6 +20,7 @@ const PLATFORMS = ["Uber", "Ola", "Lyft", "DiDi", "InDriver", "Other"];
 export function TripLogger({ onTripAdded }: { onTripAdded: () => void }) {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [geoCoords, setGeoCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [form, setForm] = useState({
     platform: "",
     amount: "",
@@ -27,6 +28,15 @@ export function TripLogger({ onTripAdded }: { onTripAdded: () => void }) {
     duration: "",
     surge_multiplier: "",
   });
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => setGeoCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        () => {} // silently ignore
+      );
+    }
+  }, []);
 
   const handleQuickAdd = async () => {
     if (!form.platform || !form.amount) {
