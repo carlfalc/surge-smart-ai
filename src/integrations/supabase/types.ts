@@ -48,6 +48,8 @@ export type Database = {
           surge_multiplier: number | null
           trip_distance_km: number | null
           trip_duration_min: number | null
+          trip_lat: number | null
+          trip_lng: number | null
           user_id: string
         }
         Insert: {
@@ -59,6 +61,8 @@ export type Database = {
           surge_multiplier?: number | null
           trip_distance_km?: number | null
           trip_duration_min?: number | null
+          trip_lat?: number | null
+          trip_lng?: number | null
           user_id: string
         }
         Update: {
@@ -70,6 +74,8 @@ export type Database = {
           surge_multiplier?: number | null
           trip_distance_km?: number | null
           trip_duration_min?: number | null
+          trip_lat?: number | null
+          trip_lng?: number | null
           user_id?: string
         }
         Relationships: []

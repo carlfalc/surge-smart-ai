@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -38,11 +38,24 @@ export default function Onboarding() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [saving, setSaving] = useState(false);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const geoRequested = useRef(false);
   const [form, setForm] = useState({
     platforms: [] as string[],
     city: "",
     earnings_goal: "",
   });
+
+  // Silently capture geolocation when Step 4 is reached
+  useEffect(() => {
+    if (step === 4 && !geoRequested.current && navigator.geolocation) {
+      geoRequested.current = true;
+      navigator.geolocation.getCurrentPosition(
+        (pos) => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        () => {} // silently ignore denial
+      );
+    }
+  }, [step]);
 
   useEffect(() => {
     if (!loading && !user) navigate("/login");

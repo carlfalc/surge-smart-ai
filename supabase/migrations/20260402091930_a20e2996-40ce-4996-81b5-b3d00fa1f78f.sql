@@ -1,0 +1,1 @@
+ALTER TABLE public.earnings ADD COLUMN trip_lat DECIMAL(9,6), ADD COLUMN trip_lng DECIMAL(9,6);

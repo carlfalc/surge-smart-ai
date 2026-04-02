@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,6 +20,7 @@ const PLATFORMS = ["Uber", "Ola", "Lyft", "DiDi", "InDriver", "Other"];
 export function TripLogger({ onTripAdded }: { onTripAdded: () => void }) {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [geoCoords, setGeoCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [form, setForm] = useState({
     platform: "",
     amount: "",
@@ -27,6 +28,15 @@ export function TripLogger({ onTripAdded }: { onTripAdded: () => void }) {
     duration: "",
     surge_multiplier: "",
   });
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => setGeoCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        () => {} // silently ignore
+      );
+    }
+  }, []);
 
   const handleQuickAdd = async () => {
     if (!form.platform || !form.amount) {
@@ -42,7 +52,9 @@ export function TripLogger({ onTripAdded }: { onTripAdded: () => void }) {
         trip_distance_km: form.distance ? parseFloat(form.distance) : null,
         trip_duration_min: form.duration ? parseInt(form.duration) : null,
         surge_multiplier: form.surge_multiplier ? parseFloat(form.surge_multiplier) : 1.0,
-      });
+        trip_lat: geoCoords?.lat ?? null,
+        trip_lng: geoCoords?.lng ?? null,
+      } as any);
       if (error) throw error;
       toast.success(`Trip logged! $${form.amount} on ${form.platform}`);
       setForm({ platform: "", amount: "", distance: "", duration: "", surge_multiplier: "" });
