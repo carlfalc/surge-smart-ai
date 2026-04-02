@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import PWAInstallBanner from "@/components/dashboard/PWAInstallBanner";
 import { useNavigate } from "react-router-dom";
 import { 
   TrendingUp, Map, Clock, Zap, DollarSign, Settings, HelpCircle, 
@@ -350,6 +351,7 @@ const Dashboard = () => {
             })()
           ) : (
             <>
+              <PWAInstallBanner />
               {/* Stats — real data */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                 <StatCard
