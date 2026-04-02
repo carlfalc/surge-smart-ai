@@ -323,6 +323,8 @@ const Dashboard = () => {
             </div>
           ) : activeTab === "earnings" ? (
             renderEarningsTab()
+          ) : activeTab === "expenses" ? (
+            <ExpenseLogger />
           ) : (
             <>
               {/* Stats — real data */}
