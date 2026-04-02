@@ -385,6 +385,7 @@ const Dashboard = () => {
                   value={stats.loading ? "—" : `${stats.todayTrips}`}
                   change={stats.todayTrips > 0 ? "Today so far" : "Start logging"}
                   positive={stats.todayTrips > 0}
+                  neutral={stats.todayTrips === 0}
                 />
                 <StatCard
                   label="Avg Surge"
