@@ -319,13 +319,14 @@ const Dashboard = () => {
             <TaxSummary />
           ) : activeTab === "heatmap" ? (
             <HeatMap />
-          ) : activeTab === "positioning" || activeTab === "fuel" || activeTab === "shifts" || activeTab === "alerts" ? (
+          ) : activeTab === "alerts" ? (
+            <AlertsPanel alertsFired={alertsFired} />
+          ) : activeTab === "positioning" || activeTab === "fuel" || activeTab === "shifts" ? (
             (() => {
               const comingSoonData: Record<string, { icon: typeof Map; title: string; description: string }> = {
                 positioning: { icon: Navigation, title: "Positioning", description: "AI-recommended waiting spots based on surge history, time of day and local events" },
                 fuel: { icon: Fuel, title: "Fuel & EV", description: "Track your fuel and charging costs, see your cost-per-km, and compare petrol vs EV savings" },
                 shifts: { icon: Clock, title: "Shift Planner", description: "Plan your week around predicted surge windows — maximise earnings with smarter shift timing" },
-                alerts: { icon: Bell, title: "Alerts", description: "Get notified when surge hits your area, when you're close to your daily goal, or when a competitor platform spikes rates" },
               };
               const item = comingSoonData[activeTab];
               const IconComp = item.icon;
