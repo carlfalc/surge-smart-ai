@@ -392,6 +392,7 @@ const Dashboard = () => {
                   value={stats.loading ? "—" : `${stats.avgSurge}x`}
                   change={stats.avgSurge > 1 ? "Above base rate" : "Base rate"}
                   positive={stats.avgSurge > 1}
+                  neutral={stats.avgSurge <= 1}
                 />
                 {(() => {
                   const todayNetProfit = stats.todayEarnings - todayExpenses;
