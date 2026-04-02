@@ -34,7 +34,7 @@ const STEPS = [
 ];
 
 export default function Onboarding() {
-  const { user, loading } = useAuth();
+  const { user, loading, refreshProfile } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [saving, setSaving] = useState(false);
