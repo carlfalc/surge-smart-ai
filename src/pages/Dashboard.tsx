@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { 
   TrendingUp, Map, Clock, Zap, DollarSign, Settings, HelpCircle, 
-  ChevronLeft, ChevronRight, Bell, Fuel, BarChart3, Navigation, LogOut, CreditCard, Mail
+  ChevronLeft, ChevronRight, Bell, Fuel, BarChart3, Navigation, LogOut, CreditCard, Mail, Receipt
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth, TIERS } from "@/contexts/AuthContext";
@@ -11,6 +11,7 @@ import { SurgePredictionCard } from "@/components/dashboard/SurgePredictionCard"
 import { TripLogger } from "@/components/dashboard/TripLogger";
 import { PlatformComparison } from "@/components/dashboard/PlatformComparison";
 import { ProfileEditor } from "@/components/dashboard/ProfileEditor";
+import { ExpenseLogger } from "@/components/dashboard/ExpenseLogger";
 import { Progress } from "@/components/ui/progress";
 import { useEarningsStats } from "@/hooks/useEarningsStats";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,6 +27,7 @@ const navItems = [
   { icon: Navigation, label: "Positioning", id: "positioning" },
   { icon: DollarSign, label: "Earnings", id: "earnings" },
   { icon: Fuel, label: "Fuel & EV", id: "fuel" },
+  { icon: Receipt, label: "Expenses", id: "expenses" },
   { icon: Clock, label: "Shift Planner", id: "shifts" },
   { icon: Bell, label: "Alerts", id: "alerts" },
 ];
@@ -321,6 +323,8 @@ const Dashboard = () => {
             </div>
           ) : activeTab === "earnings" ? (
             renderEarningsTab()
+          ) : activeTab === "expenses" ? (
+            <ExpenseLogger />
           ) : (
             <>
               {/* Stats — real data */}
