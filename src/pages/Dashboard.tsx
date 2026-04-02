@@ -323,6 +323,29 @@ const Dashboard = () => {
             <HeatMap />
           ) : activeTab === "alerts" ? (
             <AlertsPanel alertsFired={alertsFired} />
+          ) : activeTab === "density" ? (
+            <div className="flex items-center justify-center min-h-[60vh]">
+              <div className="glass rounded-2xl p-10 max-w-md text-center space-y-4">
+                <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mx-auto">
+                  <Users className="h-7 w-7 text-primary" />
+                </div>
+                <h2 className="text-xl font-display font-bold">Competitor Driver Density</h2>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  See where other rideshare drivers are clustering in real time — so you can position smarter and avoid oversaturated zones. This feature gets smarter as more TaxiFlow drivers join your city.
+                </p>
+                <span className="inline-block rounded-full bg-accent/10 border border-accent/20 px-3 py-1 text-xs font-medium text-accent">
+                  Coming Soon — Building as our driver network grows 🚗
+                </span>
+                <div>
+                  <Button
+                    variant="hero"
+                    onClick={() => toast.success("We'll notify you when Driver Density launches in your city!")}
+                  >
+                    Notify me when live
+                  </Button>
+                </div>
+              </div>
+            </div>
           ) : activeTab === "positioning" || activeTab === "fuel" || activeTab === "shifts" ? (
             (() => {
               const comingSoonData: Record<string, { icon: typeof Map; title: string; description: string }> = {
