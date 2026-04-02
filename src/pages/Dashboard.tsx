@@ -65,6 +65,7 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [refreshKey, setRefreshKey] = useState(0);
   const [todayTrips, setTodayTrips] = useState<TripRow[]>([]);
+  const [todayExpenses, setTodayExpenses] = useState(0);
 
   const stats = useEarningsStats(refreshKey);
 
@@ -88,6 +89,16 @@ const Dashboard = () => {
       setTodayTrips((data as TripRow[]) || []);
     };
     fetchTrips();
+    const fetchExpenses = async () => {
+      const today = new Date().toISOString().slice(0, 10);
+      const { data } = await supabase
+        .from("expenses")
+        .select("amount")
+        .eq("user_id", user.id)
+        .eq("date", today);
+      setTodayExpenses((data || []).reduce((s, r) => s + Number(r.amount), 0));
+    };
+    fetchExpenses();
   }, [user, refreshKey]);
 
   const handleCheckout = async (priceId: string) => {
@@ -337,6 +348,17 @@ const Dashboard = () => {
                   change={stats.avgSurge > 1 ? "Above base rate" : "Base rate"}
                   positive={stats.avgSurge > 1}
                 />
+                {(() => {
+                  const todayNetProfit = stats.todayEarnings - todayExpenses;
+                  return (
+                    <StatCard
+                      label="Net Profit (Today)"
+                      value={stats.loading ? "—" : `$${todayNetProfit.toFixed(2)}`}
+                      change={`Expenses: $${todayExpenses.toFixed(2)}`}
+                      positive={todayNetProfit >= 0}
+                    />
+                  );
+                })()}
               </div>
 
               {/* Content grid */}
