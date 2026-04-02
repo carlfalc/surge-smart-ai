@@ -308,6 +308,35 @@ const Dashboard = () => {
             <ExpenseLogger />
           ) : activeTab === "tax" ? (
             <TaxSummary />
+          ) : activeTab === "heatmap" || activeTab === "positioning" || activeTab === "fuel" || activeTab === "shifts" || activeTab === "alerts" ? (
+            (() => {
+              const comingSoonData: Record<string, { icon: typeof Map; title: string; description: string }> = {
+                heatmap: { icon: Map, title: "Heat Map", description: "See live demand zones across your city — know where rides are clustering before you drive there" },
+                positioning: { icon: Navigation, title: "Positioning", description: "AI-recommended waiting spots based on surge history, time of day and local events" },
+                fuel: { icon: Fuel, title: "Fuel & EV", description: "Track your fuel and charging costs, see your cost-per-km, and compare petrol vs EV savings" },
+                shifts: { icon: Clock, title: "Shift Planner", description: "Plan your week around predicted surge windows — maximise earnings with smarter shift timing" },
+                alerts: { icon: Bell, title: "Alerts", description: "Get notified when surge hits your area, when you're close to your daily goal, or when a competitor platform spikes rates" },
+              };
+              const item = comingSoonData[activeTab];
+              const IconComp = item.icon;
+              return (
+                <div className="flex items-center justify-center min-h-[60vh]">
+                  <div className="glass rounded-2xl p-10 max-w-md text-center space-y-4">
+                    <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mx-auto">
+                      <IconComp className="h-7 w-7 text-primary" />
+                    </div>
+                    <h2 className="text-xl font-display font-bold">{item.title}</h2>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
+                    <Button
+                      variant="hero"
+                      onClick={() => toast.success("We'll let you know!")}
+                    >
+                      Notify me when this launches
+                    </Button>
+                  </div>
+                </div>
+              );
+            })()
           ) : (
             <>
               {/* Stats — real data */}
