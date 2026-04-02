@@ -13,6 +13,7 @@ import { PlatformComparison } from "@/components/dashboard/PlatformComparison";
 import { ProfileEditor } from "@/components/dashboard/ProfileEditor";
 import { ExpenseLogger } from "@/components/dashboard/ExpenseLogger";
 import { TaxSummary } from "@/components/dashboard/TaxSummary";
+import { HeatMap } from "@/components/dashboard/HeatMap";
 import { Progress } from "@/components/ui/progress";
 import { useEarningsStats } from "@/hooks/useEarningsStats";
 import { supabase } from "@/integrations/supabase/client";
@@ -308,10 +309,11 @@ const Dashboard = () => {
             <ExpenseLogger />
           ) : activeTab === "tax" ? (
             <TaxSummary />
-          ) : activeTab === "heatmap" || activeTab === "positioning" || activeTab === "fuel" || activeTab === "shifts" || activeTab === "alerts" ? (
+          ) : activeTab === "heatmap" ? (
+            <HeatMap />
+          ) : activeTab === "positioning" || activeTab === "fuel" || activeTab === "shifts" || activeTab === "alerts" ? (
             (() => {
               const comingSoonData: Record<string, { icon: typeof Map; title: string; description: string }> = {
-                heatmap: { icon: Map, title: "Heat Map", description: "See live demand zones across your city — know where rides are clustering before you drive there" },
                 positioning: { icon: Navigation, title: "Positioning", description: "AI-recommended waiting spots based on surge history, time of day and local events" },
                 fuel: { icon: Fuel, title: "Fuel & EV", description: "Track your fuel and charging costs, see your cost-per-km, and compare petrol vs EV savings" },
                 shifts: { icon: Clock, title: "Shift Planner", description: "Plan your week around predicted surge windows — maximise earnings with smarter shift timing" },
