@@ -71,6 +71,7 @@ const Dashboard = () => {
   const [todayExpenses, setTodayExpenses] = useState(0);
 
   const stats = useEarningsStats(refreshKey);
+  const { alertsFired } = useAlerts();
 
   useEffect(() => {
     if (!loading && !user) navigate("/login");
