@@ -44,11 +44,11 @@ const bottomNav = [
   { icon: HelpCircle, label: "Help", id: "help", link: "/help" },
 ];
 
-const StatCard = ({ label, value, change, positive, children }: { label: string; value: string; change: string; positive: boolean; children?: React.ReactNode }) => (
+const StatCard = ({ label, value, change, positive, neutral, children }: { label: string; value: string; change: string; positive: boolean; neutral?: boolean; children?: React.ReactNode }) => (
   <div className="glass rounded-xl p-4">
     <p className="text-xs text-muted-foreground mb-1">{label}</p>
     <p className="text-2xl font-display font-bold">{value}</p>
-    <p className={`text-xs mt-1 ${positive ? "text-accent" : "text-destructive"}`}>{change}</p>
+    <p className={`text-xs mt-1 ${neutral ? "text-muted-foreground" : positive ? "text-accent" : "text-destructive"}`}>{change}</p>
     {children}
   </div>
 );
@@ -359,6 +359,7 @@ const Dashboard = () => {
                   value={stats.loading ? "—" : `$${stats.todayEarnings.toFixed(2)}`}
                   change={stats.todayTrips > 0 ? `${stats.todayTrips} trip${stats.todayTrips !== 1 ? "s" : ""} today` : "No trips yet"}
                   positive={stats.todayTrips > 0}
+                  neutral={stats.todayTrips === 0}
                 >
                   {profile?.earnings_goal && !stats.loading && (
                     <div className="mt-2">
@@ -377,18 +378,21 @@ const Dashboard = () => {
                   value={stats.loading ? "—" : `${stats.todayHours}h`}
                   change={stats.todayHours > 0 ? "Tracked from trips" : "Log trips to track"}
                   positive={stats.todayHours > 0}
+                  neutral={stats.todayHours === 0}
                 />
                 <StatCard
                   label="Trips Completed"
                   value={stats.loading ? "—" : `${stats.todayTrips}`}
                   change={stats.todayTrips > 0 ? "Today so far" : "Start logging"}
                   positive={stats.todayTrips > 0}
+                  neutral={stats.todayTrips === 0}
                 />
                 <StatCard
                   label="Avg Surge"
                   value={stats.loading ? "—" : `${stats.avgSurge}x`}
                   change={stats.avgSurge > 1 ? "Above base rate" : "Base rate"}
                   positive={stats.avgSurge > 1}
+                  neutral={stats.avgSurge <= 1}
                 />
                 {(() => {
                   const todayNetProfit = stats.todayEarnings - todayExpenses;
