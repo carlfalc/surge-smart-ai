@@ -283,6 +283,29 @@ export default function Onboarding() {
                   </div>
                 </div>
 
+                <div className="border-2 border-accent/30 rounded-xl p-6 bg-accent/5">
+                  <div className="flex items-center gap-3 mb-4">
+                    <FileText className="h-5 w-5 text-accent" />
+                    <h3 className="font-semibold">Why Your Entries Matter — TaxiFlow Accounts & Tax</h3>
+                  </div>
+                  <div className="space-y-3">
+                    {[
+                      "Every fare you log flows directly into your Earnings tracker — your daily, weekly and annual totals update in real time",
+                      "Your entries power the Tax Summary — TaxiFlow automatically calculates your NZ taxable income, tax bracket breakdown and GST obligation from your logged trips",
+                      "Expenses + Earnings = your real profit — pair trip entries with fuel, maintenance and insurance costs to see what you actually take home",
+                      "Export a tax-ready CSV at year end — no accountant needed, everything is tracked from the moment you log your first fare",
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-start gap-3">
+                        <div className="w-2 h-2 rounded-full bg-accent mt-1.5 shrink-0" />
+                        <p className="text-sm text-muted-foreground">{item}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground/70 italic mt-4">
+                    The more consistently you log, the more accurate your tax summary and surge predictions become.
+                  </p>
+                </div>
+
                 <div className="flex gap-3">
                   <Button variant="outline" className="flex-1" onClick={() => setStep(2)}>
                     Back
