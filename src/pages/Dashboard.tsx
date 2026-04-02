@@ -14,8 +14,10 @@ import { ProfileEditor } from "@/components/dashboard/ProfileEditor";
 import { ExpenseLogger } from "@/components/dashboard/ExpenseLogger";
 import { TaxSummary } from "@/components/dashboard/TaxSummary";
 import { HeatMap } from "@/components/dashboard/HeatMap";
+import { AlertsPanel } from "@/components/dashboard/AlertsPanel";
 import { Progress } from "@/components/ui/progress";
 import { useEarningsStats } from "@/hooks/useEarningsStats";
+import { useAlerts } from "@/hooks/useAlerts";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
@@ -69,6 +71,7 @@ const Dashboard = () => {
   const [todayExpenses, setTodayExpenses] = useState(0);
 
   const stats = useEarningsStats(refreshKey);
+  const { alertsFired } = useAlerts();
 
   useEffect(() => {
     if (!loading && !user) navigate("/login");
@@ -200,7 +203,12 @@ const Dashboard = () => {
               }`}
             >
               <item.icon className="h-4 w-4 shrink-0" />
-              {!collapsed && <span>{item.label}</span>}
+              {!collapsed && <span className="flex-1 text-left">{item.label}</span>}
+              {item.id === "alerts" && alertsFired > 0 && (
+                <span className="ml-auto w-5 h-5 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center">
+                  {alertsFired}
+                </span>
+              )}
             </button>
           ))}
         </nav>
@@ -311,13 +319,14 @@ const Dashboard = () => {
             <TaxSummary />
           ) : activeTab === "heatmap" ? (
             <HeatMap />
-          ) : activeTab === "positioning" || activeTab === "fuel" || activeTab === "shifts" || activeTab === "alerts" ? (
+          ) : activeTab === "alerts" ? (
+            <AlertsPanel alertsFired={alertsFired} />
+          ) : activeTab === "positioning" || activeTab === "fuel" || activeTab === "shifts" ? (
             (() => {
               const comingSoonData: Record<string, { icon: typeof Map; title: string; description: string }> = {
                 positioning: { icon: Navigation, title: "Positioning", description: "AI-recommended waiting spots based on surge history, time of day and local events" },
                 fuel: { icon: Fuel, title: "Fuel & EV", description: "Track your fuel and charging costs, see your cost-per-km, and compare petrol vs EV savings" },
                 shifts: { icon: Clock, title: "Shift Planner", description: "Plan your week around predicted surge windows — maximise earnings with smarter shift timing" },
-                alerts: { icon: Bell, title: "Alerts", description: "Get notified when surge hits your area, when you're close to your daily goal, or when a competitor platform spikes rates" },
               };
               const item = comingSoonData[activeTab];
               const IconComp = item.icon;
