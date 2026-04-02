@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      alert_preferences: {
+        Row: {
+          alerts_enabled: boolean | null
+          created_at: string | null
+          goal_alerts: boolean | null
+          id: string
+          platform_alerts: boolean | null
+          surge_alerts: boolean | null
+          surge_threshold: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          alerts_enabled?: boolean | null
+          created_at?: string | null
+          goal_alerts?: boolean | null
+          id?: string
+          platform_alerts?: boolean | null
+          surge_alerts?: boolean | null
+          surge_threshold?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          alerts_enabled?: boolean | null
+          created_at?: string | null
+          goal_alerts?: boolean | null
+          id?: string
+          platform_alerts?: boolean | null
+          surge_alerts?: boolean | null
+          surge_threshold?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       contact_messages: {
         Row: {
           created_at: string
