@@ -31,7 +31,7 @@ export function Hero() {
             </h1>
 
             <p className="text-lg text-muted-foreground max-w-lg mb-8 leading-relaxed">
-              TaxiFlow AI predicts surge pricing, compares platforms in real-time, and positions you where the money is. Boost your weekly earnings by 15-25%.
+              TaxiFlow AI predicts surge pricing, compares platforms in real-time, tracks expenses, and keeps you tax-ready — so you keep more of what you earn. Boost your weekly earnings by 15-25%.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4">
