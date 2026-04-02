@@ -378,6 +378,7 @@ const Dashboard = () => {
                   value={stats.loading ? "—" : `${stats.todayHours}h`}
                   change={stats.todayHours > 0 ? "Tracked from trips" : "Log trips to track"}
                   positive={stats.todayHours > 0}
+                  neutral={stats.todayHours === 0}
                 />
                 <StatCard
                   label="Trips Completed"
