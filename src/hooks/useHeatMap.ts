@@ -8,6 +8,8 @@ export interface DemandZone {
   radius: number;
   type: "nightlife" | "transport" | "business" | "residential" | "shopping" | "stadium";
   reason: string;
+  pin_lat?: number;
+  pin_lng?: number;
 }
 
 const CITY_COORDS: Record<string, { lat: number; lon: number }> = {
