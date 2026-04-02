@@ -65,6 +65,7 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [refreshKey, setRefreshKey] = useState(0);
   const [todayTrips, setTodayTrips] = useState<TripRow[]>([]);
+  const [todayExpenses, setTodayExpenses] = useState(0);
 
   const stats = useEarningsStats(refreshKey);
 
