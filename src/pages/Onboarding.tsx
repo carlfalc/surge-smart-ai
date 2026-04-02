@@ -79,15 +79,19 @@ export default function Onboarding() {
     try {
       const { error } = await supabase
         .from("profiles")
-        .update({
+        .upsert({
+          user_id: user?.id,
           preferred_platforms: form.platforms,
           city: form.city,
           earnings_goal: form.earnings_goal ? parseFloat(form.earnings_goal) : 200,
           onboarding_completed: true,
-        })
-        .eq("user_id", user?.id);
+        }, { onConflict: 'user_id' });
 
       if (error) throw error;
+
+      await supabase
+        .from("alert_preferences")
+        .upsert({ user_id: user?.id }, { onConflict: 'user_id' });
       toast.success("You're all set! Welcome to TaxiFlow AI 🚀");
       navigate("/dashboard");
     } catch {
