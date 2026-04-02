@@ -89,6 +89,16 @@ const Dashboard = () => {
       setTodayTrips((data as TripRow[]) || []);
     };
     fetchTrips();
+    const fetchExpenses = async () => {
+      const today = new Date().toISOString().slice(0, 10);
+      const { data } = await supabase
+        .from("expenses")
+        .select("amount")
+        .eq("user_id", user.id)
+        .eq("date", today);
+      setTodayExpenses((data || []).reduce((s, r) => s + Number(r.amount), 0));
+    };
+    fetchExpenses();
   }, [user, refreshKey]);
 
   const handleCheckout = async (priceId: string) => {
