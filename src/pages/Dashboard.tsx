@@ -4,7 +4,7 @@ import PWAInstallBanner from "@/components/dashboard/PWAInstallBanner";
 import { useNavigate } from "react-router-dom";
 import { 
   TrendingUp, Map, Clock, Zap, DollarSign, Settings, HelpCircle, 
-  ChevronLeft, ChevronRight, Bell, Fuel, BarChart3, Navigation, LogOut, CreditCard, Receipt, FileText
+  ChevronLeft, ChevronRight, Bell, Fuel, BarChart3, Navigation, LogOut, CreditCard, Receipt, FileText, Users
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth, TIERS } from "@/contexts/AuthContext";
