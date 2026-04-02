@@ -348,6 +348,17 @@ const Dashboard = () => {
                   change={stats.avgSurge > 1 ? "Above base rate" : "Base rate"}
                   positive={stats.avgSurge > 1}
                 />
+                {(() => {
+                  const todayNetProfit = stats.todayEarnings - todayExpenses;
+                  return (
+                    <StatCard
+                      label="Net Profit (Today)"
+                      value={stats.loading ? "—" : `$${todayNetProfit.toFixed(2)}`}
+                      change={`Expenses: $${todayExpenses.toFixed(2)}`}
+                      positive={todayNetProfit >= 0}
+                    />
+                  );
+                })()}
               </div>
 
               {/* Content grid */}
