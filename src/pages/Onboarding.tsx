@@ -71,31 +71,28 @@ export default function Onboarding() {
   };
 
   const handleFinish = async () => {
-    if (!form.city) {
-      toast.error("Please select your city");
-      return;
-    }
+    if (!form.city) { toast.error("Please select your city"); return; }
+    if (!user?.id) { toast.error("Not logged in"); return; }
     setSaving(true);
     try {
       const { error } = await supabase
         .from("profiles")
         .upsert({
-          user_id: user?.id,
+          user_id: user.id,
           preferred_platforms: form.platforms,
           city: form.city,
           earnings_goal: form.earnings_goal ? parseFloat(form.earnings_goal) : 200,
           onboarding_completed: true,
         }, { onConflict: 'user_id' });
-
       if (error) throw error;
-
       await supabase
         .from("alert_preferences")
-        .upsert({ user_id: user?.id }, { onConflict: 'user_id' });
+        .upsert({ user_id: user.id }, { onConflict: 'user_id' });
+      await refreshProfile();
       toast.success("You're all set! Welcome to TaxiFlow AI 🚀");
       navigate("/dashboard");
-    } catch {
-      toast.error("Failed to save settings");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to save settings");
     } finally {
       setSaving(false);
     }
