@@ -14,8 +14,10 @@ import { ProfileEditor } from "@/components/dashboard/ProfileEditor";
 import { ExpenseLogger } from "@/components/dashboard/ExpenseLogger";
 import { TaxSummary } from "@/components/dashboard/TaxSummary";
 import { HeatMap } from "@/components/dashboard/HeatMap";
+import { AlertsPanel } from "@/components/dashboard/AlertsPanel";
 import { Progress } from "@/components/ui/progress";
 import { useEarningsStats } from "@/hooks/useEarningsStats";
+import { useAlerts } from "@/hooks/useAlerts";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
