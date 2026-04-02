@@ -27,6 +27,7 @@ const navItems = [
   { icon: Navigation, label: "Positioning", id: "positioning" },
   { icon: DollarSign, label: "Earnings", id: "earnings" },
   { icon: Fuel, label: "Fuel & EV", id: "fuel" },
+  { icon: Receipt, label: "Expenses", id: "expenses" },
   { icon: Clock, label: "Shift Planner", id: "shifts" },
   { icon: Bell, label: "Alerts", id: "alerts" },
 ];
