@@ -29,6 +29,7 @@ const navItems = [
   { icon: DollarSign, label: "Earnings", id: "earnings" },
   { icon: Fuel, label: "Fuel & EV", id: "fuel" },
   { icon: Receipt, label: "Expenses", id: "expenses" },
+  { icon: FileText, label: "Tax Summary", id: "tax" },
   { icon: Clock, label: "Shift Planner", id: "shifts" },
   { icon: Bell, label: "Alerts", id: "alerts" },
 ];
