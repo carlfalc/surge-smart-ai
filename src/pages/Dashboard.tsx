@@ -203,7 +203,12 @@ const Dashboard = () => {
               }`}
             >
               <item.icon className="h-4 w-4 shrink-0" />
-              {!collapsed && <span>{item.label}</span>}
+              {!collapsed && <span className="flex-1 text-left">{item.label}</span>}
+              {item.id === "alerts" && alertsFired > 0 && (
+                <span className="ml-auto w-5 h-5 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center">
+                  {alertsFired}
+                </span>
+              )}
             </button>
           ))}
         </nav>
