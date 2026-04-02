@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { TrendingUp, Map, ArrowLeftRight, Fuel, Clock, Brain } from "lucide-react";
+import { TrendingUp, Map, ArrowLeftRight, Fuel, Clock, Brain, Receipt, FileText } from "lucide-react";
 
 const features = [
   {
@@ -21,6 +21,16 @@ const features = [
     icon: TrendingUp,
     title: "Earnings Analytics",
     description: "Track your hourly rate, trip efficiency, and weekly trends. See exactly where your income comes from.",
+  },
+  {
+    icon: Receipt,
+    title: "Expense Tracker",
+    description: "Log fuel, maintenance, insurance and more. See your real profit after costs — not just gross earnings.",
+  },
+  {
+    icon: FileText,
+    title: "Tax Ready",
+    description: "Automatic NZ tax calculations, GST threshold tracker, and one-click CSV export at year end. No accountant needed.",
   },
   {
     icon: Fuel,
