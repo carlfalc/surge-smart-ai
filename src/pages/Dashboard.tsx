@@ -359,6 +359,7 @@ const Dashboard = () => {
                   value={stats.loading ? "—" : `$${stats.todayEarnings.toFixed(2)}`}
                   change={stats.todayTrips > 0 ? `${stats.todayTrips} trip${stats.todayTrips !== 1 ? "s" : ""} today` : "No trips yet"}
                   positive={stats.todayTrips > 0}
+                  neutral={stats.todayTrips === 0}
                 >
                   {profile?.earnings_goal && !stats.loading && (
                     <div className="mt-2">
