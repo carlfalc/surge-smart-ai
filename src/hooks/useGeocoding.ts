@@ -3,6 +3,7 @@ import { useState, useRef, useCallback } from "react";
 export interface GeocodingResult {
   name: string;
   country: string;
+  country_code: string;
   admin1: string;
   latitude: number;
   longitude: number;
@@ -16,7 +17,7 @@ export function useGeocoding() {
 
   const search = useCallback((query: string) => {
     if (timerRef.current) clearTimeout(timerRef.current);
-    if (!query || query.length < 3) {
+    if (!query || query.length < 2) {
       setResults([]);
       return;
     }
@@ -33,6 +34,7 @@ export function useGeocoding() {
             data.results.map((r: any) => ({
               name: r.name,
               country: r.country || "",
+              country_code: r.country_code || "",
               admin1: r.admin1 || "",
               latitude: r.latitude,
               longitude: r.longitude,
@@ -47,8 +49,10 @@ export function useGeocoding() {
       } finally {
         setLoading(false);
       }
-    }, 400);
+    }, 350);
   }, []);
 
-  return { results, loading, search };
+  const clear = useCallback(() => setResults([]), []);
+
+  return { results, loading, search, clear };
 }

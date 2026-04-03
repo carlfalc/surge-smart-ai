@@ -5,25 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { User, Save, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
+import { CitySearch } from "@/components/ui/CitySearch";
 
 const PLATFORMS = ["Uber", "Ola", "DiDi", "Lyft", "InDriver", "Other"];
-const CITIES = [
-  "Auckland", "Wellington", "Christchurch", "Hamilton", "Tauranga",
-  "Sydney", "Melbourne", "Brisbane", "Perth", "Adelaide",
-  "London", "Manchester", "Birmingham",
-  "New York", "Los Angeles", "Chicago",
-  "Other",
-];
 
 export function ProfileEditor() {
   const { user, profile } = useAuth();
@@ -31,6 +18,8 @@ export function ProfileEditor() {
   const [form, setForm] = useState({
     full_name: "",
     city: "",
+    city_lat: null as number | null,
+    city_lng: null as number | null,
     earnings_goal: "",
     preferred_platforms: [] as string[],
   });
@@ -40,6 +29,8 @@ export function ProfileEditor() {
       setForm({
         full_name: profile.full_name || "",
         city: profile.city || "",
+        city_lat: profile.city_lat ? Number(profile.city_lat) : null,
+        city_lng: profile.city_lng ? Number(profile.city_lng) : null,
         earnings_goal: profile.earnings_goal?.toString() || "",
         preferred_platforms: profile.preferred_platforms || [],
       });
@@ -61,6 +52,8 @@ export function ProfileEditor() {
       const updateData: Record<string, unknown> = {
         full_name: form.full_name,
         city: form.city,
+        city_lat: form.city_lat,
+        city_lng: form.city_lng,
         preferred_platforms: form.preferred_platforms,
       };
       if (form.earnings_goal) {
@@ -104,18 +97,14 @@ export function ProfileEditor() {
         {/* City */}
         <div className="space-y-2">
           <Label>City</Label>
-          <Select value={form.city} onValueChange={(v) => setForm((f) => ({ ...f, city: v }))}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select your city" />
-            </SelectTrigger>
-            <SelectContent>
-              {CITIES.map((c) => (
-                <SelectItem key={c} value={c}>
-                  {c}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <CitySearch
+            value={form.city}
+            onSelect={(c) => setForm((f) => ({ ...f, city: c.name, city_lat: c.lat, city_lng: c.lng }))}
+            placeholder="Search any city worldwide..."
+          />
+          <p className="text-xs text-muted-foreground">
+            🌍 Search any city worldwide — Whanganui, London, Dubai, anywhere you drive.
+          </p>
         </div>
 
         {/* Platforms */}
