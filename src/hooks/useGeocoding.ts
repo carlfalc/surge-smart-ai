@@ -28,8 +28,7 @@ export function useGeocoding() {
       setLoading(true);
       try {
         const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=6&addressdetails=1`,
-          { headers: { 'User-Agent': 'TaxiFlowAI/1.0' } }
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=6&addressdetails=1`
         );
         const data = await res.json();
         if (Array.isArray(data) && data.length > 0) {
