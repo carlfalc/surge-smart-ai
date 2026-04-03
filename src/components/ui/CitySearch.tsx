@@ -60,7 +60,7 @@ export function CitySearch({ value, onSelect, placeholder = "Search any address 
   };
 
   return (
-    <div ref={wrapperRef} className="relative">
+    <div ref={wrapperRef} className="relative" style={{ zIndex: 9999 }}>
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
