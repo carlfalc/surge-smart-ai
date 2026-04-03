@@ -15,16 +15,10 @@ import {
 import { toast } from "sonner";
 import { CheckCircle, PenLine, ChevronRight, Car, Zap, FileText } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { CitySearch } from "@/components/ui/CitySearch";
 
 const PLATFORMS = ["Uber", "Ola", "DiDi", "Lyft", "InDriver", "Bolt"];
 
-const CITIES = [
-  "Auckland", "Wellington", "Christchurch", "Hamilton", "Tauranga",
-  "Sydney", "Melbourne", "Brisbane", "Perth", "Adelaide",
-  "London", "Manchester", "Birmingham",
-  "New York", "Los Angeles", "Chicago",
-  "Other",
-];
 
 const STEPS = [
   { id: 1, label: "Welcome" },
@@ -43,6 +37,8 @@ export default function Onboarding() {
   const [form, setForm] = useState({
     platforms: [] as string[],
     city: "",
+    city_lat: null as number | null,
+    city_lng: null as number | null,
     earnings_goal: "",
   });
 
@@ -81,6 +77,8 @@ export default function Onboarding() {
           user_id: user.id,
           preferred_platforms: form.platforms,
           city: form.city,
+          city_lat: form.city_lat,
+          city_lng: form.city_lng,
           earnings_goal: form.earnings_goal ? parseFloat(form.earnings_goal) : 200,
           onboarding_completed: true,
         }, { onConflict: 'user_id' });
@@ -329,21 +327,11 @@ export default function Onboarding() {
 
                 <div className="space-y-2">
                   <Label>What city do you drive in?</Label>
-                  <Select
+                  <CitySearch
                     value={form.city}
-                    onValueChange={(v) => setForm((f) => ({ ...f, city: v }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select your city" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {CITIES.map((c) => (
-                        <SelectItem key={c} value={c}>
-                          {c}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    onSelect={(c) => setForm((f) => ({ ...f, city: c.name, city_lat: c.lat, city_lng: c.lng }))}
+                    placeholder="Search any city…"
+                  />
                 </div>
 
                 <div className="space-y-2">

@@ -12,59 +12,61 @@ export interface DemandZone {
   pin_lng?: number;
 }
 
-const CITY_COORDS: Record<string, { lat: number; lon: number }> = {
-  Auckland: { lat: -36.8509, lon: 174.7645 },
-  Wellington: { lat: -41.2866, lon: 174.7756 },
-  Christchurch: { lat: -43.5321, lon: 172.6362 },
-  Hamilton: { lat: -37.787, lon: 175.2793 },
-  Tauranga: { lat: -37.6878, lon: 176.1651 },
-  Sydney: { lat: -33.8688, lon: 151.2093 },
-  Melbourne: { lat: -37.8136, lon: 144.9631 },
-  Brisbane: { lat: -27.4698, lon: 153.0251 },
-  Perth: { lat: -31.9505, lon: 115.8605 },
-  Adelaide: { lat: -34.9285, lon: 138.6007 },
-  London: { lat: 51.5074, lon: -0.1278 },
-  Manchester: { lat: 53.4808, lon: -2.2426 },
-  Birmingham: { lat: 52.4862, lon: -1.8904 },
-  "New York": { lat: 40.7128, lon: -74.006 },
-  "Los Angeles": { lat: 34.0522, lon: -118.2437 },
-  Chicago: { lat: 41.8781, lon: -87.6298 },
-};
+const DEFAULT_CENTER = { lat: -36.8509, lng: 174.7645 };
 
-export function getCityCenter(city: string) {
-  const coords = CITY_COORDS[city];
-  if (coords) return { lat: coords.lat, lng: coords.lon };
-  return { lat: -36.8509, lng: 174.7645 }; // default Auckland
+async function geocodeCity(city: string): Promise<{ lat: number; lng: number } | null> {
+  try {
+    const res = await fetch(
+      `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1`
+    );
+    const data = await res.json();
+    if (data.results?.[0]) {
+      return { lat: data.results[0].latitude, lng: data.results[0].longitude };
+    }
+  } catch {}
+  return null;
 }
 
-const CITY_LANDMARKS: Record<string, string> = {
-  Auckland: "Britomart, Viaduct Harbour, Ponsonby, Sky City, Auckland Airport, Newmarket, Parnell, K Road, Mt Eden, Takapuna",
-  Wellington: "Courtenay Place, Cuba Street, Lambton Quay, Wellington Airport, Te Aro, Thorndon, Newtown",
-  Christchurch: "Cathedral Square, Christchurch Airport, Riccarton, Sumner, Merivale",
-  Sydney: "CBD/Circular Quay, Kings Cross, Darling Harbour, Sydney Airport, Bondi, Surry Hills, Newtown, Barangaroo",
-  Melbourne: "CBD/Flinders St, Southbank, St Kilda, Melbourne Airport, Fitzroy, Chapel Street, Richmond",
-  Brisbane: "CBD/Queen Street, Fortitude Valley, South Bank, Brisbane Airport, West End, New Farm",
-  London: "Soho, Liverpool Street, Heathrow Airport, Canary Wharf, Kings Cross, Shoreditch, Westminster, Camden",
-  Manchester: "Deansgate, Northern Quarter, Manchester Airport, Piccadilly, Oxford Road, Ancoats",
-  "New York": "Midtown Manhattan, JFK Airport, Times Square, Brooklyn Downtown, LaGuardia, Lower East Side, SoHo, Williamsburg",
-  "Los Angeles": "Downtown LA, LAX Airport, Hollywood, Santa Monica, Beverly Hills, WeHo",
-  Chicago: "The Loop, O'Hare Airport, Wicker Park, River North, Lincoln Park, Wrigleyville",
-};
+// Cache geocoded results in memory
+const geoCache = new Map<string, { lat: number; lng: number }>();
 
-export function useHeatMap(city: string) {
+export function getCityCenter(city: string, coords?: { lat: number; lng: number }) {
+  if (coords) return coords;
+  if (geoCache.has(city)) return geoCache.get(city)!;
+  return DEFAULT_CENTER;
+}
+
+export function useHeatMap(city: string, coords?: { lat: number; lng: number }) {
   const [zones, setZones] = useState<DemandZone[]>([]);
   const [loading, setLoading] = useState(false);
+  const [resolvedCoords, setResolvedCoords] = useState<{ lat: number; lng: number } | null>(coords || null);
   const intervalRef = useRef<ReturnType<typeof setInterval>>();
 
+  // Resolve coords when city changes
+  useEffect(() => {
+    if (coords) {
+      setResolvedCoords(coords);
+      geoCache.set(city, coords);
+      return;
+    }
+    geocodeCity(city).then((result) => {
+      if (result) {
+        geoCache.set(city, result);
+        setResolvedCoords(result);
+      } else {
+        setResolvedCoords(DEFAULT_CENTER);
+      }
+    });
+  }, [city, coords?.lat, coords?.lng]);
+
   const refresh = useCallback(async () => {
-    if (!city) return;
+    if (!city || !resolvedCoords) return;
     setLoading(true);
 
     try {
       const now = new Date();
       const timeStr = now.toLocaleTimeString("en-NZ", { hour: "2-digit", minute: "2-digit", hour12: true });
       const dayOfWeek = now.toLocaleDateString("en-NZ", { weekday: "long" });
-      const landmarks = CITY_LANDMARKS[city] || "city centre, airport, main entertainment district, business district";
 
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
@@ -80,9 +82,9 @@ export function useHeatMap(city: string) {
           messages: [
             {
               role: "user",
-              content: `You are a rideshare demand analyst. It is currently ${timeStr} on ${dayOfWeek} in ${city}.
+              content: `You are a rideshare demand analyst. It is currently ${timeStr} on ${dayOfWeek} in ${city} (lat: ${resolvedCoords.lat}, lng: ${resolvedCoords.lng}).
 
-Using your real knowledge of ${city}'s geography and landmarks (${landmarks}), return a JSON array of 8-12 demand zones where rideshare demand is currently likely to be elevated.
+Using your real knowledge of ${city}'s geography and landmarks, return a JSON array of 8-12 demand zones where rideshare demand is currently likely to be elevated.
 
 Each zone must have ACCURATE real-world coordinates for the named location. Use these exact fields:
 {
@@ -153,7 +155,7 @@ Return ONLY a valid JSON array, no markdown, no wrapping.`,
     } finally {
       setLoading(false);
     }
-  }, [city]);
+  }, [city, resolvedCoords]);
 
   useEffect(() => {
     refresh();
@@ -163,5 +165,5 @@ Return ONLY a valid JSON array, no markdown, no wrapping.`,
     };
   }, [refresh]);
 
-  return { zones, loading, refresh };
+  return { zones, loading, refresh, resolvedCoords };
 }

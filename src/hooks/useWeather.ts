@@ -11,25 +11,6 @@ export interface WeatherData {
   emoji: string;
 }
 
-const CITY_COORDS: Record<string, { lat: number; lon: number }> = {
-  Auckland: { lat: -36.8509, lon: 174.7645 },
-  Wellington: { lat: -41.2866, lon: 174.7756 },
-  Christchurch: { lat: -43.5321, lon: 172.6362 },
-  Hamilton: { lat: -37.787, lon: 175.2793 },
-  Tauranga: { lat: -37.6878, lon: 176.1651 },
-  Sydney: { lat: -33.8688, lon: 151.2093 },
-  Melbourne: { lat: -37.8136, lon: 144.9631 },
-  Brisbane: { lat: -27.4698, lon: 153.0251 },
-  Perth: { lat: -31.9505, lon: 115.8605 },
-  Adelaide: { lat: -34.9285, lon: 138.6007 },
-  London: { lat: 51.5074, lon: -0.1278 },
-  Manchester: { lat: 53.4808, lon: -2.2426 },
-  Birmingham: { lat: 52.4862, lon: -1.8904 },
-  "New York": { lat: 40.7128, lon: -74.006 },
-  "Los Angeles": { lat: 34.0522, lon: -118.2437 },
-  Chicago: { lat: 41.8781, lon: -87.6298 },
-};
-
 const getWeatherDescription = (code: number): { description: string; emoji: string } => {
   if (code === 0) return { description: "Clear sky", emoji: "☀️" };
   if (code <= 3) return { description: "Partly cloudy", emoji: "⛅" };
@@ -66,7 +47,20 @@ const getSurgeImpact = (
   return { surgeImpact: "none", surgeReason: "Clear conditions — normal demand expected." };
 };
 
-export function useWeather(city: string) {
+async function geocodeCity(city: string): Promise<{ lat: number; lon: number } | null> {
+  try {
+    const res = await fetch(
+      `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1`
+    );
+    const data = await res.json();
+    if (data.results?.[0]) {
+      return { lat: data.results[0].latitude, lon: data.results[0].longitude };
+    }
+  } catch {}
+  return null;
+}
+
+export function useWeather(city: string, coords?: { lat: number; lng: number }) {
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -76,20 +70,16 @@ export function useWeather(city: string) {
     const fetchWeather = async () => {
       setLoading(true);
       try {
-        const coords = CITY_COORDS[city];
         let lat: number, lon: number;
 
         if (coords) {
           lat = coords.lat;
-          lon = coords.lon;
+          lon = coords.lng;
         } else {
-          const geoRes = await fetch(
-            `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1`
-          );
-          const geoData = await geoRes.json();
-          if (!geoData.results?.[0]) return;
-          lat = geoData.results[0].latitude;
-          lon = geoData.results[0].longitude;
+          const geo = await geocodeCity(city);
+          if (!geo) return;
+          lat = geo.lat;
+          lon = geo.lon;
         }
 
         const res = await fetch(
@@ -127,7 +117,7 @@ export function useWeather(city: string) {
     fetchWeather();
     const interval = setInterval(fetchWeather, 30 * 60 * 1000);
     return () => clearInterval(interval);
-  }, [city]);
+  }, [city, coords?.lat, coords?.lng]);
 
   return { weather, loading };
 }

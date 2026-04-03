@@ -3,29 +3,8 @@ import { useHeatMap, getCityCenter } from "@/hooks/useHeatMap";
 import { useAuth } from "@/contexts/AuthContext";
 import { WeatherBadge } from "@/components/dashboard/WeatherBadge";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { RefreshCw, MapPin } from "lucide-react";
-
-const CITIES = ["Auckland","Wellington","Christchurch","Hamilton","Tauranga","Sydney","Melbourne","Brisbane","Perth","Adelaide","London","Manchester","Birmingham","New York","Los Angeles","Chicago"];
-
-const CITY_COORDS: Record<string, { lat: number; lon: number }> = {
-  Auckland: { lat: -36.8509, lon: 174.7645 },
-  Wellington: { lat: -41.2866, lon: 174.7756 },
-  Christchurch: { lat: -43.5321, lon: 172.6362 },
-  Hamilton: { lat: -37.787, lon: 175.2793 },
-  Tauranga: { lat: -37.6878, lon: 176.1651 },
-  Sydney: { lat: -33.8688, lon: 151.2093 },
-  Melbourne: { lat: -37.8136, lon: 144.9631 },
-  Brisbane: { lat: -27.4698, lon: 153.0251 },
-  Perth: { lat: -31.9505, lon: 115.8605 },
-  Adelaide: { lat: -34.9285, lon: 138.6007 },
-  London: { lat: 51.5074, lon: -0.1278 },
-  Manchester: { lat: 53.4808, lon: -2.2426 },
-  Birmingham: { lat: 52.4862, lon: -1.8904 },
-  "New York": { lat: 40.7128, lon: -74.006 },
-  "Los Angeles": { lat: 34.0522, lon: -118.2437 },
-  Chicago: { lat: 41.8781, lon: -87.6298 },
-};
+import { CitySearch } from "@/components/ui/CitySearch";
+import { RefreshCw } from "lucide-react";
 
 function getZoneColor(demand: number) {
   if (demand > 70) return "#ef4444";
@@ -50,18 +29,30 @@ interface ForecastAlert {
   text: string;
 }
 
-function useForecastAlert(city: string): ForecastAlert | null {
+function useForecastAlert(city: string, coords?: { lat: number; lng: number }): ForecastAlert | null {
   const [alert, setAlert] = useState<ForecastAlert | null>(null);
 
   useEffect(() => {
     if (!city) return;
-    const coords = CITY_COORDS[city];
-    if (!coords) return;
 
     const fetchForecast = async () => {
       try {
+        let lat: number, lon: number;
+        if (coords) {
+          lat = coords.lat;
+          lon = coords.lng;
+        } else {
+          const geoRes = await fetch(
+            `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1`
+          );
+          const geoData = await geoRes.json();
+          if (!geoData.results?.[0]) return;
+          lat = geoData.results[0].latitude;
+          lon = geoData.results[0].longitude;
+        }
+
         const res = await fetch(
-          `https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lon}&hourly=weathercode,rain&forecast_days=1`
+          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=weathercode,rain&forecast_days=1`
         );
         const data = await res.json();
         if (!data.hourly?.time) return;
@@ -72,7 +63,6 @@ function useForecastAlert(city: string): ForecastAlert | null {
         const rainValues: number[] = data.hourly.rain;
         const weatherCodes: number[] = data.hourly.weathercode;
 
-        // Find next 2 hours
         const upcoming: { hour: number; rain: number; code: number }[] = [];
         for (let i = 0; i < times.length && upcoming.length < 2; i++) {
           const h = new Date(times[i]).getHours();
@@ -99,7 +89,7 @@ function useForecastAlert(city: string): ForecastAlert | null {
     };
 
     fetchForecast();
-  }, [city]);
+  }, [city, coords?.lat, coords?.lng]);
 
   return alert;
 }
@@ -107,8 +97,13 @@ function useForecastAlert(city: string): ForecastAlert | null {
 export function HeatMap() {
   const { profile } = useAuth();
   const [city, setCity] = useState(profile?.city || "Auckland");
-  const { zones, loading, refresh } = useHeatMap(city);
-  const forecastAlert = useForecastAlert(city);
+  const [cityCoords, setCityCoords] = useState<{ lat: number; lng: number } | undefined>(
+    profile?.city_lat && profile?.city_lng
+      ? { lat: Number(profile.city_lat), lng: Number(profile.city_lng) }
+      : undefined
+  );
+  const { zones, loading, refresh, resolvedCoords } = useHeatMap(city, cityCoords);
+  const forecastAlert = useForecastAlert(city, cityCoords || resolvedCoords || undefined);
   const mapRef = useRef<HTMLDivElement | null>(null);
   const leafletMapRef = useRef<any>(null);
   const circlesRef = useRef<any[]>([]);
@@ -117,7 +112,7 @@ export function HeatMap() {
   useEffect(() => {
     if (!mapRef.current || leafletMapRef.current) return;
     import("leaflet").then((L) => {
-      const center = getCityCenter(city);
+      const center = getCityCenter(city, cityCoords);
       const map = L.map(mapRef.current!, { zoomControl: true, scrollWheelZoom: true });
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: '&copy; OpenStreetMap',
@@ -136,9 +131,9 @@ export function HeatMap() {
   // Recenter when city changes
   useEffect(() => {
     if (!leafletMapRef.current) return;
-    const center = getCityCenter(city);
+    const center = getCityCenter(city, cityCoords);
     leafletMapRef.current.setView([center.lat, center.lng], 13);
-  }, [city]);
+  }, [city, cityCoords]);
 
   // Draw zones
   useEffect(() => {
@@ -161,7 +156,6 @@ export function HeatMap() {
           .addTo(leafletMapRef.current);
         circlesRef.current.push(circle);
 
-        // Add pin marker for best pickup hotspot
         if (zone.pin_lat != null && zone.pin_lng != null) {
           const icon = L.divIcon({
             className: '',
@@ -171,7 +165,7 @@ export function HeatMap() {
               border-radius: 50%;
               width: 12px;
               height: 12px;
-              box-shadow: 0 0 6px rgba(0,0,0,0.5);
+              box-shadow: 0 0 8px rgba(0,0,0,0.6);
             "></div>`,
             iconSize: [12, 12],
             iconAnchor: [6, 6],
@@ -187,19 +181,16 @@ export function HeatMap() {
 
   return (
     <div className="space-y-4">
-      {/* Controls */}
       <div className="flex flex-wrap items-center gap-3">
-        <Select value={city} onValueChange={setCity}>
-          <SelectTrigger className="w-[180px] glass border-0">
-            <MapPin className="h-3 w-3 mr-1 text-primary" />
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {CITIES.map((c) => (
-              <SelectItem key={c} value={c}>{c}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="w-[220px]">
+          <CitySearch
+            value={city}
+            onSelect={(c) => {
+              setCity(c.name);
+              setCityCoords({ lat: c.lat, lng: c.lng });
+            }}
+          />
+        </div>
 
         <WeatherBadge city={city} />
 
@@ -214,7 +205,6 @@ export function HeatMap() {
           {loading ? "Updating…" : "Refresh"}
         </Button>
 
-        {/* Legend */}
         <div className="flex items-center gap-3 ml-auto text-xs text-muted-foreground">
           <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-accent inline-block" /> Low</span>
           <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full inline-block" style={{ background: "#f59e0b" }} /> Medium</span>
@@ -222,7 +212,6 @@ export function HeatMap() {
         </div>
       </div>
 
-      {/* Map */}
       <div className="h-[500px] w-full rounded-2xl overflow-hidden border border-border relative">
         {loading && zones.length === 0 && (
           <div className="absolute inset-0 z-[1000] flex items-center justify-center bg-background/80">

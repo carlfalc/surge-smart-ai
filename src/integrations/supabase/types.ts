@@ -149,6 +149,8 @@ export type Database = {
       profiles: {
         Row: {
           city: string | null
+          city_lat: number | null
+          city_lng: number | null
           created_at: string
           earnings_goal: number | null
           full_name: string | null
@@ -163,6 +165,8 @@ export type Database = {
         }
         Insert: {
           city?: string | null
+          city_lat?: number | null
+          city_lng?: number | null
           created_at?: string
           earnings_goal?: number | null
           full_name?: string | null
@@ -177,6 +181,8 @@ export type Database = {
         }
         Update: {
           city?: string | null
+          city_lat?: number | null
+          city_lng?: number | null
           created_at?: string
           earnings_goal?: number | null
           full_name?: string | null
