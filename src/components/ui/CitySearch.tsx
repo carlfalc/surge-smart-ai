@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { useGeocoding, GeocodingResult } from "@/hooks/useGeocoding";
-import { MapPin, Loader2 } from "lucide-react";
+import { MapPin, Loader2, Search } from "lucide-react";
 
 interface CitySelection {
   name: string;
@@ -16,10 +16,10 @@ interface CitySearchProps {
   placeholder?: string;
 }
 
-export function CitySearch({ value, onSelect, placeholder = "Search any city…" }: CitySearchProps) {
+export function CitySearch({ value, onSelect, placeholder = "Search any city worldwide..." }: CitySearchProps) {
   const [query, setQuery] = useState(value || "");
   const [open, setOpen] = useState(false);
-  const { results, loading, search } = useGeocoding();
+  const { results, loading, search, clear } = useGeocoding();
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -45,18 +45,19 @@ export function CitySearch({ value, onSelect, placeholder = "Search any city…"
   const handleSelect = (r: GeocodingResult) => {
     setQuery(r.display);
     setOpen(false);
+    clear();
     onSelect({ name: r.name, lat: r.latitude, lng: r.longitude, display: r.display });
   };
 
   return (
     <div ref={wrapperRef} className="relative">
       <div className="relative">
-        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           value={query}
           onChange={(e) => handleChange(e.target.value)}
           placeholder={placeholder}
-          className="pl-9"
+          className="pl-9 pr-9"
           onFocus={() => results.length > 0 && setOpen(true)}
         />
         {loading && (
@@ -69,13 +70,21 @@ export function CitySearch({ value, onSelect, placeholder = "Search any city…"
             <button
               key={`${r.latitude}-${r.longitude}-${i}`}
               type="button"
-              className="w-full text-left px-3 py-2 text-sm hover:bg-muted/50 transition-colors flex items-center gap-2"
+              className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-muted/50 transition-colors border-b border-border/50 last:border-0"
               onClick={() => handleSelect(r)}
             >
-              <MapPin className="h-3 w-3 text-primary shrink-0" />
-              <span>{r.display}</span>
+              <MapPin className="h-3.5 w-3.5 text-primary shrink-0" />
+              <div>
+                <p className="text-sm font-medium">{r.name}</p>
+                <p className="text-xs text-muted-foreground">{[r.admin1, r.country].filter(Boolean).join(", ")}</p>
+              </div>
             </button>
           ))}
+        </div>
+      )}
+      {open && !loading && results.length === 0 && query.length >= 2 && (
+        <div className="absolute z-50 mt-1 w-full rounded-lg border border-border bg-background/95 backdrop-blur-md shadow-lg px-4 py-3 text-sm text-muted-foreground">
+          No cities found for "{query}"
         </div>
       )}
     </div>
