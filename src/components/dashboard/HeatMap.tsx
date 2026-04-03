@@ -193,12 +193,42 @@ export function HeatMap() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-3">
-        <div className="w-[220px]">
+        <div className="w-[260px]">
           <CitySearch
             value={city}
             onSelect={(c) => {
               setCity(c.name);
               setCityCoords({ lat: c.lat, lng: c.lng });
+
+              // Fly map immediately
+              if (leafletMapRef.current) {
+                const zoom = getSearchZoom(c.type, c.class);
+                leafletMapRef.current.flyTo([c.lat, c.lng], zoom, { duration: 1.2 });
+
+                // Add search pin
+                import("leaflet").then((L) => {
+                  if (searchPinRef.current) {
+                    searchPinRef.current.remove();
+                    searchPinRef.current = null;
+                  }
+                  const icon = L.divIcon({
+                    className: '',
+                    html: `<div style="
+                      background: hsl(221, 83%, 53%);
+                      border: 3px solid white;
+                      border-radius: 50%;
+                      width: 16px;
+                      height: 16px;
+                      box-shadow: 0 0 12px rgba(59,130,246,0.6);
+                    "></div>`,
+                    iconSize: [16, 16],
+                    iconAnchor: [8, 8],
+                  });
+                  searchPinRef.current = L.marker([c.lat, c.lng], { icon })
+                    .bindPopup(`<strong>${c.display || c.name}</strong><br/>Searched location`)
+                    .addTo(leafletMapRef.current);
+                });
+              }
             }}
           />
         </div>
