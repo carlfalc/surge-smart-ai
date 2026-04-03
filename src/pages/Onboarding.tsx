@@ -77,6 +77,8 @@ export default function Onboarding() {
           user_id: user.id,
           preferred_platforms: form.platforms,
           city: form.city,
+          city_lat: form.city_lat,
+          city_lng: form.city_lng,
           earnings_goal: form.earnings_goal ? parseFloat(form.earnings_goal) : 200,
           onboarding_completed: true,
         }, { onConflict: 'user_id' });
