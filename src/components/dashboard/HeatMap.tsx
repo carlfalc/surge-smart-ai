@@ -99,6 +99,16 @@ function getForecastPillClasses(severity: "clear" | "warning" | "danger") {
 }
 
 export function HeatMap() {
+  useEffect(() => {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+    link.id = 'leaflet-css';
+    if (!document.getElementById('leaflet-css')) {
+      document.head.appendChild(link);
+    }
+  }, []);
+
   const { profile } = useAuth();
   const [city, setCity] = useState(profile?.city || "Auckland");
   const [cityCoords, setCityCoords] = useState<{ lat: number; lng: number } | undefined>(
