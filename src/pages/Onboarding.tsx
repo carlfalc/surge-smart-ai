@@ -15,6 +15,7 @@ import {
 import { toast } from "sonner";
 import { CheckCircle, PenLine, ChevronRight, Car, Zap, FileText } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { CitySearch } from "@/components/ui/CitySearch";
 
 const PLATFORMS = ["Uber", "Ola", "DiDi", "Lyft", "InDriver", "Bolt"];
 
