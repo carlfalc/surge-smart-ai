@@ -93,18 +93,14 @@ export function ProfileEditor() {
         {/* City */}
         <div className="space-y-2">
           <Label>City</Label>
-          <Select value={form.city} onValueChange={(v) => setForm((f) => ({ ...f, city: v }))}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select your city" />
-            </SelectTrigger>
-            <SelectContent>
-              {CITIES.map((c) => (
-                <SelectItem key={c} value={c}>
-                  {c}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <CitySearch
+            value={form.city}
+            onSelect={(c) => setForm((f) => ({ ...f, city: c.name, city_lat: c.lat, city_lng: c.lng }))}
+            placeholder="Search any city worldwide..."
+          />
+          <p className="text-xs text-muted-foreground">
+            🌍 Search any city worldwide — Whanganui, London, Dubai, anywhere you drive.
+          </p>
         </div>
 
         {/* Platforms */}
