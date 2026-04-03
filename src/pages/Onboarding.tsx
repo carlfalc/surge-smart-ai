@@ -37,6 +37,8 @@ export default function Onboarding() {
   const [form, setForm] = useState({
     platforms: [] as string[],
     city: "",
+    city_lat: null as number | null,
+    city_lng: null as number | null,
     earnings_goal: "",
   });
 
