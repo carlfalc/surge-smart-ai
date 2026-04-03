@@ -119,7 +119,7 @@ export function HeatMap() {
     }
   }, []);
 
-  const { profile } = useAuth();
+  const { profile, user, refreshProfile } = useAuth();
   const [city, setCity] = useState(profile?.city || "Auckland");
   const [cityCoords, setCityCoords] = useState<{ lat: number; lng: number } | undefined>(
     profile?.city_lat && profile?.city_lng
