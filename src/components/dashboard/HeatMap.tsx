@@ -98,7 +98,16 @@ function getForecastPillClasses(severity: "clear" | "warning" | "danger") {
   return "bg-muted border-border text-muted-foreground";
 }
 
+function getSearchZoom(type?: string, cls?: string): number {
+  const cityTypes = ["city", "town", "administrative", "state", "country"];
+  if (type && cityTypes.includes(type)) return 12;
+  if (cls === "boundary") return 12;
+  return 15;
+}
+
 export function HeatMap() {
+  const searchPinRef = useRef<any>(null);
+
   useEffect(() => {
     const link = document.createElement('link');
     link.rel = 'stylesheet';
