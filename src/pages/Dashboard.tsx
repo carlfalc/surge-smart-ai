@@ -4,7 +4,7 @@ import PWAInstallBanner from "@/components/dashboard/PWAInstallBanner";
 import { useNavigate } from "react-router-dom";
 import { 
   TrendingUp, Map, Clock, Zap, DollarSign, Settings, HelpCircle, 
-  ChevronLeft, ChevronRight, Bell, Fuel, BarChart3, Navigation, LogOut, CreditCard, Receipt, FileText, Users
+  ChevronLeft, ChevronRight, Bell, Fuel, BarChart3, Navigation, LogOut, CreditCard, Receipt, FileText, Users, Star
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth, TIERS } from "@/contexts/AuthContext";
@@ -16,6 +16,7 @@ import { ExpenseLogger } from "@/components/dashboard/ExpenseLogger";
 import { TaxSummary } from "@/components/dashboard/TaxSummary";
 import { HeatMap } from "@/components/dashboard/HeatMap";
 import { AlertsPanel } from "@/components/dashboard/AlertsPanel";
+import { FavouriteLocations } from "@/components/dashboard/FavouriteLocations";
 import { Progress } from "@/components/ui/progress";
 import { useEarningsStats } from "@/hooks/useEarningsStats";
 import { useAlerts } from "@/hooks/useAlerts";
