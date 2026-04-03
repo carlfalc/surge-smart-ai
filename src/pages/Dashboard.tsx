@@ -338,6 +338,10 @@ const Dashboard = () => {
             <TaxSummary />
           ) : activeTab === "heatmap" ? (
             <HeatMap />
+          ) : activeTab === "favourites" ? (
+            <FavouriteLocations onViewOnMap={(lat, lng, name) => {
+              setActiveTab("heatmap");
+            }} />
           ) : activeTab === "alerts" ? (
             <AlertsPanel alertsFired={alertsFired} />
           ) : activeTab === "density" ? (
