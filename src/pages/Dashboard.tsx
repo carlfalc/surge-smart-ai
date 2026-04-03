@@ -28,6 +28,7 @@ import {
 
 const navItems = [
   { icon: BarChart3, label: "Dashboard", id: "dashboard" },
+  { icon: Star, label: "Favourites", id: "favourites" },
   { icon: Map, label: "Heat Map", id: "heatmap" },
   { icon: Users, label: "Driver Density", id: "density" },
   { icon: TrendingUp, label: "Surge Predict", id: "surge" },
