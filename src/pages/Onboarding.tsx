@@ -327,21 +327,11 @@ export default function Onboarding() {
 
                 <div className="space-y-2">
                   <Label>What city do you drive in?</Label>
-                  <Select
+                  <CitySearch
                     value={form.city}
-                    onValueChange={(v) => setForm((f) => ({ ...f, city: v }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select your city" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {CITIES.map((c) => (
-                        <SelectItem key={c} value={c}>
-                          {c}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    onSelect={(c) => setForm((f) => ({ ...f, city: c.name, city_lat: c.lat, city_lng: c.lng }))}
+                    placeholder="Search any city…"
+                  />
                 </div>
 
                 <div className="space-y-2">
