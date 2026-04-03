@@ -210,6 +210,15 @@ export function HeatMap() {
               setCity(c.name);
               setCityCoords({ lat: c.lat, lng: c.lng });
 
+              // Save to profile so other dashboard tabs update too
+              if (user?.id) {
+                supabase
+                  .from("profiles")
+                  .update({ city: c.name, city_lat: c.lat, city_lng: c.lng })
+                  .eq("user_id", user.id)
+                  .then(() => refreshProfile());
+              }
+
               // Fly map immediately
               if (leafletMapRef.current) {
                 const zoom = getSearchZoom(c.type, c.class);
