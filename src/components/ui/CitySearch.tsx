@@ -93,7 +93,7 @@ export function CitySearch({ value, onSelect, placeholder = "Search any address 
         </div>
       )}
       {open && !loading && results.length === 0 && query.length >= 3 && (
-        <div className="absolute z-50 mt-1 w-full rounded-lg border border-border bg-background/95 backdrop-blur-md shadow-lg px-4 py-3 text-sm text-muted-foreground">
+        <div className="absolute z-[9999] mt-1 w-full rounded-lg border border-border bg-background/95 backdrop-blur-md shadow-lg px-4 py-3 text-sm text-muted-foreground">
           No results found for "{query}"
         </div>
       )}
