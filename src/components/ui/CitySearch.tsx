@@ -60,7 +60,7 @@ export function CitySearch({ value, onSelect, placeholder = "Search any address 
   };
 
   return (
-    <div ref={wrapperRef} className="relative">
+    <div ref={wrapperRef} className="relative" style={{ zIndex: 9999 }}>
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
@@ -75,7 +75,7 @@ export function CitySearch({ value, onSelect, placeholder = "Search any address 
         )}
       </div>
       {open && results.length > 0 && (
-        <div className="absolute z-50 mt-1 w-full rounded-lg border border-border bg-background/95 backdrop-blur-md shadow-lg max-h-56 overflow-y-auto">
+        <div className="absolute z-[9999] mt-1 w-full rounded-lg border border-border bg-background/95 backdrop-blur-md shadow-lg max-h-56 overflow-y-auto">
           {results.map((r, i) => (
             <button
               key={`${r.latitude}-${r.longitude}-${i}`}
@@ -93,7 +93,7 @@ export function CitySearch({ value, onSelect, placeholder = "Search any address 
         </div>
       )}
       {open && !loading && results.length === 0 && query.length >= 3 && (
-        <div className="absolute z-50 mt-1 w-full rounded-lg border border-border bg-background/95 backdrop-blur-md shadow-lg px-4 py-3 text-sm text-muted-foreground">
+        <div className="absolute z-[9999] mt-1 w-full rounded-lg border border-border bg-background/95 backdrop-blur-md shadow-lg px-4 py-3 text-sm text-muted-foreground">
           No results found for "{query}"
         </div>
       )}
