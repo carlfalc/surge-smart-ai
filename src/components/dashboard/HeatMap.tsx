@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useHeatMap, getCityCenter } from "@/hooks/useHeatMap";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { WeatherBadge } from "@/components/dashboard/WeatherBadge";
 import { Button } from "@/components/ui/button";
 import { CitySearch } from "@/components/ui/CitySearch";
