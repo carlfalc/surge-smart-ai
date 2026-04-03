@@ -8,6 +8,8 @@ export interface GeocodingResult {
   latitude: number;
   longitude: number;
   display: string;
+  type: string;
+  class: string;
 }
 
 export function useGeocoding() {
@@ -17,7 +19,7 @@ export function useGeocoding() {
 
   const search = useCallback((query: string) => {
     if (timerRef.current) clearTimeout(timerRef.current);
-    if (!query || query.length < 2) {
+    if (!query || query.length < 3) {
       setResults([]);
       return;
     }
@@ -26,19 +28,22 @@ export function useGeocoding() {
       setLoading(true);
       try {
         const res = await fetch(
-          `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=8&language=en&format=json`
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=6&addressdetails=1`,
+          { headers: { 'User-Agent': 'TaxiFlowAI/1.0' } }
         );
         const data = await res.json();
-        if (data.results) {
+        if (Array.isArray(data) && data.length > 0) {
           setResults(
-            data.results.map((r: any) => ({
-              name: r.name,
-              country: r.country || "",
-              country_code: r.country_code || "",
-              admin1: r.admin1 || "",
-              latitude: r.latitude,
-              longitude: r.longitude,
-              display: [r.name, r.admin1, r.country].filter(Boolean).join(", "),
+            data.map((r: any) => ({
+              name: r.name || r.display_name?.split(",")[0] || "",
+              country: r.address?.country || "",
+              country_code: r.address?.country_code || "",
+              admin1: r.address?.state || r.address?.region || "",
+              latitude: parseFloat(r.lat),
+              longitude: parseFloat(r.lon),
+              display: r.display_name || "",
+              type: r.type || "",
+              class: r.class || "",
             }))
           );
         } else {

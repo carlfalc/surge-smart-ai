@@ -8,6 +8,8 @@ interface CitySelection {
   lat: number;
   lng: number;
   display: string;
+  type?: string;
+  class?: string;
 }
 
 interface CitySearchProps {
@@ -16,7 +18,7 @@ interface CitySearchProps {
   placeholder?: string;
 }
 
-export function CitySearch({ value, onSelect, placeholder = "Search any city worldwide..." }: CitySearchProps) {
+export function CitySearch({ value, onSelect, placeholder = "Search any address worldwide..." }: CitySearchProps) {
   const [query, setQuery] = useState(value || "");
   const [open, setOpen] = useState(false);
   const { results, loading, search, clear } = useGeocoding();
@@ -43,10 +45,18 @@ export function CitySearch({ value, onSelect, placeholder = "Search any city wor
   };
 
   const handleSelect = (r: GeocodingResult) => {
-    setQuery(r.display);
+    const shortDisplay = [r.name, r.admin1, r.country].filter(Boolean).join(", ");
+    setQuery(shortDisplay);
     setOpen(false);
     clear();
-    onSelect({ name: r.name, lat: r.latitude, lng: r.longitude, display: r.display });
+    onSelect({
+      name: r.name,
+      lat: r.latitude,
+      lng: r.longitude,
+      display: shortDisplay,
+      type: r.type,
+      class: r.class,
+    });
   };
 
   return (
@@ -74,17 +84,17 @@ export function CitySearch({ value, onSelect, placeholder = "Search any city wor
               onClick={() => handleSelect(r)}
             >
               <MapPin className="h-3.5 w-3.5 text-primary shrink-0" />
-              <div>
-                <p className="text-sm font-medium">{r.name}</p>
-                <p className="text-xs text-muted-foreground">{[r.admin1, r.country].filter(Boolean).join(", ")}</p>
+              <div className="min-w-0">
+                <p className="text-sm font-medium truncate">{r.name}</p>
+                <p className="text-xs text-muted-foreground truncate">{r.display}</p>
               </div>
             </button>
           ))}
         </div>
       )}
-      {open && !loading && results.length === 0 && query.length >= 2 && (
+      {open && !loading && results.length === 0 && query.length >= 3 && (
         <div className="absolute z-50 mt-1 w-full rounded-lg border border-border bg-background/95 backdrop-blur-md shadow-lg px-4 py-3 text-sm text-muted-foreground">
-          No cities found for "{query}"
+          No results found for "{query}"
         </div>
       )}
     </div>
