@@ -4,7 +4,7 @@ import PWAInstallBanner from "@/components/dashboard/PWAInstallBanner";
 import { useNavigate } from "react-router-dom";
 import { 
   TrendingUp, Map, Clock, Zap, DollarSign, Settings, HelpCircle, 
-  ChevronLeft, ChevronRight, Bell, Fuel, BarChart3, Navigation, LogOut, CreditCard, Receipt, FileText, Users
+  ChevronLeft, ChevronRight, Bell, Fuel, BarChart3, Navigation, LogOut, CreditCard, Receipt, FileText, Users, Star
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth, TIERS } from "@/contexts/AuthContext";
@@ -16,6 +16,7 @@ import { ExpenseLogger } from "@/components/dashboard/ExpenseLogger";
 import { TaxSummary } from "@/components/dashboard/TaxSummary";
 import { HeatMap } from "@/components/dashboard/HeatMap";
 import { AlertsPanel } from "@/components/dashboard/AlertsPanel";
+import { FavouriteLocations } from "@/components/dashboard/FavouriteLocations";
 import { Progress } from "@/components/ui/progress";
 import { useEarningsStats } from "@/hooks/useEarningsStats";
 import { useAlerts } from "@/hooks/useAlerts";
@@ -27,6 +28,7 @@ import {
 
 const navItems = [
   { icon: BarChart3, label: "Dashboard", id: "dashboard" },
+  { icon: Star, label: "Favourites", id: "favourites" },
   { icon: Map, label: "Heat Map", id: "heatmap" },
   { icon: Users, label: "Driver Density", id: "density" },
   { icon: TrendingUp, label: "Surge Predict", id: "surge" },
@@ -71,9 +73,19 @@ const Dashboard = () => {
   const [refreshKey, setRefreshKey] = useState(0);
   const [todayTrips, setTodayTrips] = useState<TripRow[]>([]);
   const [todayExpenses, setTodayExpenses] = useState(0);
+  const [hasFavourites, setHasFavourites] = useState(false);
 
   const stats = useEarningsStats(refreshKey);
   const { alertsFired } = useAlerts();
+
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("favourite_locations")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .then(({ count }) => setHasFavourites((count || 0) > 0));
+  }, [user, activeTab]);
 
   useEffect(() => {
     if (!loading && !user) navigate("/login");
@@ -204,7 +216,12 @@ const Dashboard = () => {
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
             >
-              <item.icon className="h-4 w-4 shrink-0" />
+              <div className="relative shrink-0">
+                <item.icon className="h-4 w-4" />
+                {item.id === "favourites" && hasFavourites && (
+                  <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-yellow-500" />
+                )}
+              </div>
               {!collapsed && <span className="flex-1 text-left">{item.label}</span>}
               {item.id === "alerts" && alertsFired > 0 && (
                 <span className="ml-auto w-5 h-5 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center">
@@ -321,6 +338,10 @@ const Dashboard = () => {
             <TaxSummary />
           ) : activeTab === "heatmap" ? (
             <HeatMap />
+          ) : activeTab === "favourites" ? (
+            <FavouriteLocations onViewOnMap={(lat, lng, name) => {
+              setActiveTab("heatmap");
+            }} />
           ) : activeTab === "alerts" ? (
             <AlertsPanel alertsFired={alertsFired} />
           ) : activeTab === "density" ? (

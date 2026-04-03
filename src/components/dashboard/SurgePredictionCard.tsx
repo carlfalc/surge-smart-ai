@@ -3,9 +3,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { TrendingUp, RefreshCw, MapPin } from "lucide-react";
+import { TrendingUp, RefreshCw, MapPin, Star } from "lucide-react";
 import { useWeather } from "@/hooks/useWeather";
 import { WeatherBadge } from "@/components/dashboard/WeatherBadge";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface SurgeArea {
   area: string;
@@ -21,13 +23,44 @@ interface SurgeData {
 }
 
 export function SurgePredictionCard() {
-  const { profile } = useAuth();
+  const { user, profile } = useAuth();
   const [surgeData, setSurgeData] = useState<SurgeData | null>(null);
   const [loading, setLoading] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [savedAreas, setSavedAreas] = useState<Set<string>>(new Set());
 
   const city = profile?.city || "Auckland";
   const { weather } = useWeather(city);
+
+  // Load existing favourites for this city
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("favourite_locations")
+      .select("name")
+      .eq("user_id", user.id)
+      .then(({ data }) => {
+        if (data) setSavedAreas(new Set(data.map((d: any) => d.name)));
+      });
+  }, [user]);
+
+  const toggleFavourite = async (area: SurgeArea) => {
+    if (!user) return;
+    if (savedAreas.has(area.area)) {
+      await supabase.from("favourite_locations").delete().eq("user_id", user.id).eq("name", area.area);
+      setSavedAreas((prev) => { const n = new Set(prev); n.delete(area.area); return n; });
+      toast.success("Removed from favourites");
+    } else {
+      await supabase.from("favourite_locations").insert({
+        user_id: user.id,
+        name: area.area,
+        city,
+        zone_type: "surge",
+      });
+      setSavedAreas((prev) => new Set(prev).add(area.area));
+      toast.success("⭐ Saved to favourites!");
+    }
+  };
 
   const fetchSurgePredictions = useCallback(async () => {
     setLoading(true);
@@ -77,7 +110,6 @@ Include 4 areas. Base predictions on current time of day, weather conditions, an
         const { done, value } = await reader.read();
         if (done) break;
         const chunk = decoder.decode(value, { stream: true });
-        // Parse SSE lines
         for (const line of chunk.split("\n")) {
           if (!line.startsWith("data: ")) continue;
           const data = line.slice(6).trim();
@@ -95,7 +127,6 @@ Include 4 areas. Base predictions on current time of day, weather conditions, an
       const jsonMatch = accumulated.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         const parsed: SurgeData = JSON.parse(jsonMatch[0]);
-        // Filter out malformed areas
         if (parsed.areas) {
           parsed.areas = parsed.areas.filter(
             (a) => a.area && typeof a.area === "string" && a.area.length > 1
@@ -181,6 +212,19 @@ Include 4 areas. Base predictions on current time of day, weather conditions, an
                   }`}
                 >
                   <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => toggleFavourite(area)}
+                      className="hover:scale-110 transition-transform"
+                      title={savedAreas.has(area.area) ? "Remove from favourites" : "Save to favourites"}
+                    >
+                      <Star
+                        className={`h-3 w-3 ${
+                          savedAreas.has(area.area)
+                            ? "text-yellow-500 fill-yellow-500"
+                            : "text-muted-foreground"
+                        }`}
+                      />
+                    </button>
                     <span className="text-sm font-medium">{area.area || "Unknown"}</span>
                     {area.area === surgeData.best_area && (
                       <span className="text-[10px] bg-accent/20 text-accent px-2 py-0.5 rounded-full font-semibold">
