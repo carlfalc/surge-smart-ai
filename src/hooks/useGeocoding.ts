@@ -49,8 +49,10 @@ export function useGeocoding() {
       } finally {
         setLoading(false);
       }
-    }, 400);
+    }, 350);
   }, []);
 
-  return { results, loading, search };
+  const clear = useCallback(() => setResults([]), []);
+
+  return { results, loading, search, clear };
 }
