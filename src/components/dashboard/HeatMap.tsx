@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useHeatMap, getCityCenter } from "@/hooks/useHeatMap";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { WeatherBadge } from "@/components/dashboard/WeatherBadge";
 import { Button } from "@/components/ui/button";
 import { CitySearch } from "@/components/ui/CitySearch";
@@ -118,7 +119,7 @@ export function HeatMap() {
     }
   }, []);
 
-  const { profile } = useAuth();
+  const { profile, user, refreshProfile } = useAuth();
   const [city, setCity] = useState(profile?.city || "Auckland");
   const [cityCoords, setCityCoords] = useState<{ lat: number; lng: number } | undefined>(
     profile?.city_lat && profile?.city_lng
@@ -208,6 +209,15 @@ export function HeatMap() {
             onSelect={(c) => {
               setCity(c.name);
               setCityCoords({ lat: c.lat, lng: c.lng });
+
+              // Save to profile so other dashboard tabs update too
+              if (user?.id) {
+                supabase
+                  .from("profiles")
+                  .update({ city: c.name, city_lat: c.lat, city_lng: c.lng })
+                  .eq("user_id", user.id)
+                  .then(() => refreshProfile());
+              }
 
               // Fly map immediately
               if (leafletMapRef.current) {
