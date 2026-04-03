@@ -146,6 +146,42 @@ export type Database = {
         }
         Relationships: []
       }
+      favourite_locations: {
+        Row: {
+          city: string | null
+          created_at: string | null
+          id: string
+          lat: number | null
+          lng: number | null
+          name: string
+          notes: string | null
+          user_id: string
+          zone_type: string | null
+        }
+        Insert: {
+          city?: string | null
+          created_at?: string | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          name: string
+          notes?: string | null
+          user_id: string
+          zone_type?: string | null
+        }
+        Update: {
+          city?: string | null
+          created_at?: string | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          name?: string
+          notes?: string | null
+          user_id?: string
+          zone_type?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           city: string | null
