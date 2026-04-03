@@ -75,7 +75,7 @@ export function CitySearch({ value, onSelect, placeholder = "Search any address 
         )}
       </div>
       {open && results.length > 0 && (
-        <div className="absolute z-50 mt-1 w-full rounded-lg border border-border bg-background/95 backdrop-blur-md shadow-lg max-h-56 overflow-y-auto">
+        <div className="absolute z-[9999] mt-1 w-full rounded-lg border border-border bg-background/95 backdrop-blur-md shadow-lg max-h-56 overflow-y-auto">
           {results.map((r, i) => (
             <button
               key={`${r.latitude}-${r.longitude}-${i}`}
