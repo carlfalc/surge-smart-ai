@@ -27,7 +27,6 @@ async function geocodeCity(city: string): Promise<{ lat: number; lng: number } |
   return null;
 }
 
-// Cache geocoded results in memory
 const geoCache = new Map<string, { lat: number; lng: number }>();
 
 export function getCityCenter(city: string, coords?: { lat: number; lng: number }) {
@@ -42,7 +41,6 @@ export function useHeatMap(city: string, coords?: { lat: number; lng: number }) 
   const [resolvedCoords, setResolvedCoords] = useState<{ lat: number; lng: number } | null>(coords || null);
   const intervalRef = useRef<ReturnType<typeof setInterval>>();
 
-  // Resolve coords when city changes
   useEffect(() => {
     if (coords) {
       setResolvedCoords(coords);
@@ -95,9 +93,11 @@ Each zone must have ACCURATE real-world coordinates for the named location. Use 
   "radius": number (metres, 200-800, larger for airports/districts),
   "type": "nightlife"|"transport"|"business"|"residential"|"shopping"|"stadium",
   "reason": "short explanation of why demand is high/low right now",
-  "pin_lat": number (precise latitude of the single best pickup hotspot within this zone — e.g. a specific intersection, train station entrance, or venue door),
-  "pin_lng": number (precise longitude of the best pickup hotspot)
+  "pin_lat": number,
+  "pin_lng": number
 }
+
+IMPORTANT: pin_lat and pin_lng are REQUIRED fields for every zone. They must be the precise coordinates (6 decimal places) of the single best street-level pickup location within the zone — a specific intersection, station entrance, terminal door or venue entrance. Do not omit these fields.
 
 Score demand realistically based on:
 - Time: ${timeStr} — nightlife peaks 10pm-3am, business peaks 7-9am & 5-7pm, airports are steady, shopping peaks midday-5pm
@@ -146,7 +146,8 @@ Return ONLY a valid JSON array, no markdown, no wrapping.`,
             typeof z.lat === "number" &&
             typeof z.lng === "number" &&
             typeof z.demand === "number" &&
-            typeof z.radius === "number"
+            typeof z.radius === "number" &&
+            z.demand >= 40
         );
         if (valid.length) setZones(valid);
       }
@@ -157,8 +158,13 @@ Return ONLY a valid JSON array, no markdown, no wrapping.`,
     }
   }, [city, resolvedCoords]);
 
+  // Trigger refresh when coords resolve
   useEffect(() => {
-    refresh();
+    if (resolvedCoords) refresh();
+  }, [resolvedCoords?.lat, resolvedCoords?.lng]);
+
+  // Set up 15-minute auto-refresh interval only
+  useEffect(() => {
     intervalRef.current = setInterval(refresh, 15 * 60 * 1000);
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);

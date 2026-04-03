@@ -8,8 +8,7 @@ import { RefreshCw } from "lucide-react";
 
 function getZoneColor(demand: number) {
   if (demand > 70) return "#ef4444";
-  if (demand >= 40) return "#f59e0b";
-  return "#22c55e";
+  return "#f59e0b";
 }
 
 function getWeatherEmoji(code: number) {
@@ -27,10 +26,11 @@ function getWeatherEmoji(code: number) {
 interface ForecastAlert {
   emoji: string;
   text: string;
+  severity: "clear" | "warning" | "danger";
 }
 
-function useForecastAlert(city: string, coords?: { lat: number; lng: number }): ForecastAlert | null {
-  const [alert, setAlert] = useState<ForecastAlert | null>(null);
+function useForecastAlert(city: string, coords?: { lat: number; lng: number }): ForecastAlert {
+  const [alert, setAlert] = useState<ForecastAlert>({ emoji: "☀️", text: "Clear conditions next 2hrs", severity: "clear" });
 
   useEffect(() => {
     if (!city) return;
@@ -71,20 +71,18 @@ function useForecastAlert(city: string, coords?: { lat: number; lng: number }): 
           }
         }
 
-        const hasRain = upcoming.some((u) => u.rain > 0.5 || u.code >= 51);
-        if (hasRain && upcoming.length > 0) {
-          const startHour = upcoming[0].hour;
-          const endHour = upcoming[upcoming.length - 1].hour + 1;
-          const emoji = getWeatherEmoji(upcoming.find((u) => u.rain > 0.5)?.code || 61);
-          setAlert({
-            emoji,
-            text: `Rain moving in — ${String(startHour).padStart(2, "0")}:00–${String(endHour).padStart(2, "0")}:00 · High surge likely`,
-          });
+        const heavyRain = upcoming.some((u) => u.rain > 2 || u.code >= 80);
+        const lightRain = upcoming.some((u) => u.rain > 0.5 || u.code >= 51);
+
+        if (heavyRain) {
+          setAlert({ emoji: "⛈️", text: "Heavy rain — high surge incoming!", severity: "danger" });
+        } else if (lightRain) {
+          setAlert({ emoji: "🌧️", text: "Rain moving in — surge likely", severity: "warning" });
         } else {
-          setAlert(null);
+          setAlert({ emoji: "☀️", text: "Clear conditions next 2hrs", severity: "clear" });
         }
       } catch {
-        setAlert(null);
+        setAlert({ emoji: "☀️", text: "Clear conditions next 2hrs", severity: "clear" });
       }
     };
 
@@ -92,6 +90,12 @@ function useForecastAlert(city: string, coords?: { lat: number; lng: number }): 
   }, [city, coords?.lat, coords?.lng]);
 
   return alert;
+}
+
+function getForecastPillClasses(severity: "clear" | "warning" | "danger") {
+  if (severity === "danger") return "bg-destructive/10 border-destructive/20 text-destructive";
+  if (severity === "warning") return "bg-yellow-500/10 border-yellow-500/20 text-yellow-600 dark:text-yellow-400";
+  return "bg-muted border-border text-muted-foreground";
 }
 
 export function HeatMap() {
@@ -108,7 +112,6 @@ export function HeatMap() {
   const leafletMapRef = useRef<any>(null);
   const circlesRef = useRef<any[]>([]);
 
-  // Init map once
   useEffect(() => {
     if (!mapRef.current || leafletMapRef.current) return;
     import("leaflet").then((L) => {
@@ -128,14 +131,12 @@ export function HeatMap() {
     };
   }, []);
 
-  // Recenter when city changes
   useEffect(() => {
     if (!leafletMapRef.current) return;
     const center = getCityCenter(city, cityCoords);
     leafletMapRef.current.setView([center.lat, center.lng], 13);
   }, [city, cityCoords]);
 
-  // Draw zones
   useEffect(() => {
     if (!leafletMapRef.current || zones.length === 0) return;
     import("leaflet").then((L) => {
@@ -156,25 +157,25 @@ export function HeatMap() {
           .addTo(leafletMapRef.current);
         circlesRef.current.push(circle);
 
-        if (zone.pin_lat != null && zone.pin_lng != null) {
-          const icon = L.divIcon({
-            className: '',
-            html: `<div style="
-              background: ${color};
-              border: 2px solid white;
-              border-radius: 50%;
-              width: 12px;
-              height: 12px;
-              box-shadow: 0 0 8px rgba(0,0,0,0.6);
-            "></div>`,
-            iconSize: [12, 12],
-            iconAnchor: [6, 6],
-          });
-          const marker = L.marker([zone.pin_lat, zone.pin_lng], { icon })
-            .bindPopup(`<strong>${zone.name}</strong><br/>Best pickup spot<br/>Demand: ${zone.demand}/100`)
-            .addTo(leafletMapRef.current);
-          circlesRef.current.push(marker);
-        }
+        const pinLat = zone.pin_lat ?? zone.lat;
+        const pinLng = zone.pin_lng ?? zone.lng;
+        const icon = L.divIcon({
+          className: '',
+          html: `<div style="
+            background: ${color};
+            border: 2px solid white;
+            border-radius: 50%;
+            width: 12px;
+            height: 12px;
+            box-shadow: 0 0 8px rgba(0,0,0,0.6);
+          "></div>`,
+          iconSize: [12, 12],
+          iconAnchor: [6, 6],
+        });
+        const marker = L.marker([pinLat, pinLng], { icon })
+          .bindPopup(`<strong>${zone.name}</strong><br/>Best pickup spot<br/>Demand: ${zone.demand}/100`)
+          .addTo(leafletMapRef.current);
+        circlesRef.current.push(marker);
       });
     });
   }, [zones]);
@@ -194,11 +195,9 @@ export function HeatMap() {
 
         <WeatherBadge city={city} />
 
-        {forecastAlert && (
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-destructive/10 border border-destructive/20 px-3 py-1 text-xs font-medium text-destructive">
-            {forecastAlert.emoji} {forecastAlert.text}
-          </span>
-        )}
+        <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium ${getForecastPillClasses(forecastAlert.severity)}`}>
+          {forecastAlert.emoji} {forecastAlert.text}
+        </span>
 
         <Button variant="ghost" size="sm" onClick={refresh} disabled={loading} className="text-xs">
           <RefreshCw className={`h-3 w-3 mr-1 ${loading ? "animate-spin" : ""}`} />
@@ -206,7 +205,6 @@ export function HeatMap() {
         </Button>
 
         <div className="flex items-center gap-3 ml-auto text-xs text-muted-foreground">
-          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-accent inline-block" /> Low</span>
           <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full inline-block" style={{ background: "#f59e0b" }} /> Medium</span>
           <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-destructive inline-block" /> High</span>
         </div>
