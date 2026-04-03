@@ -19,13 +19,6 @@ import { CitySearch } from "@/components/ui/CitySearch";
 
 const PLATFORMS = ["Uber", "Ola", "DiDi", "Lyft", "InDriver", "Bolt"];
 
-const CITIES = [
-  "Auckland", "Wellington", "Christchurch", "Hamilton", "Tauranga",
-  "Sydney", "Melbourne", "Brisbane", "Perth", "Adelaide",
-  "London", "Manchester", "Birmingham",
-  "New York", "Los Angeles", "Chicago",
-  "Other",
-];
 
 const STEPS = [
   { id: 1, label: "Welcome" },
