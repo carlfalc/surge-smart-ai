@@ -34,6 +34,7 @@ export function useGeocoding() {
             data.results.map((r: any) => ({
               name: r.name,
               country: r.country || "",
+              country_code: r.country_code || "",
               admin1: r.admin1 || "",
               latitude: r.latitude,
               longitude: r.longitude,
