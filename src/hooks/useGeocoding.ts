@@ -17,7 +17,7 @@ export function useGeocoding() {
 
   const search = useCallback((query: string) => {
     if (timerRef.current) clearTimeout(timerRef.current);
-    if (!query || query.length < 3) {
+    if (!query || query.length < 2) {
       setResults([]);
       return;
     }
