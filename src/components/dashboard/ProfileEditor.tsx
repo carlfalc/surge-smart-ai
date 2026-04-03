@@ -18,6 +18,8 @@ export function ProfileEditor() {
   const [form, setForm] = useState({
     full_name: "",
     city: "",
+    city_lat: null as number | null,
+    city_lng: null as number | null,
     earnings_goal: "",
     preferred_platforms: [] as string[],
   });
