@@ -3,6 +3,7 @@ import { useState, useRef, useCallback } from "react";
 export interface GeocodingResult {
   name: string;
   country: string;
+  country_code: string;
   admin1: string;
   latitude: number;
   longitude: number;
