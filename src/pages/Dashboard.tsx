@@ -73,9 +73,19 @@ const Dashboard = () => {
   const [refreshKey, setRefreshKey] = useState(0);
   const [todayTrips, setTodayTrips] = useState<TripRow[]>([]);
   const [todayExpenses, setTodayExpenses] = useState(0);
+  const [hasFavourites, setHasFavourites] = useState(false);
 
   const stats = useEarningsStats(refreshKey);
   const { alertsFired } = useAlerts();
+
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("favourite_locations")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .then(({ count }) => setHasFavourites((count || 0) > 0));
+  }, [user, activeTab]);
 
   useEffect(() => {
     if (!loading && !user) navigate("/login");
