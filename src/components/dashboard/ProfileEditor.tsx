@@ -29,6 +29,8 @@ export function ProfileEditor() {
       setForm({
         full_name: profile.full_name || "",
         city: profile.city || "",
+        city_lat: profile.city_lat ? Number(profile.city_lat) : null,
+        city_lng: profile.city_lng ? Number(profile.city_lng) : null,
         earnings_goal: profile.earnings_goal?.toString() || "",
         preferred_platforms: profile.preferred_platforms || [],
       });
