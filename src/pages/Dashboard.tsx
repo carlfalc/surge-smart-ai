@@ -216,7 +216,12 @@ const Dashboard = () => {
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
             >
-              <item.icon className="h-4 w-4 shrink-0" />
+              <div className="relative shrink-0">
+                <item.icon className="h-4 w-4" />
+                {item.id === "favourites" && hasFavourites && (
+                  <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-yellow-500" />
+                )}
+              </div>
               {!collapsed && <span className="flex-1 text-left">{item.label}</span>}
               {item.id === "alerts" && alertsFired > 0 && (
                 <span className="ml-auto w-5 h-5 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center">
