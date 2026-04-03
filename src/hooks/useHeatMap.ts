@@ -158,9 +158,14 @@ Return ONLY a valid JSON array, no markdown, no wrapping.`,
     }
   }, [city, resolvedCoords]);
 
+  // Clear zones when city changes
+  useEffect(() => {
+    setZones([]);
+  }, [city]);
+
   // Trigger refresh when coords resolve
   useEffect(() => {
-    if (resolvedCoords) refresh();
+    if (resolvedCoords && !loading) refresh();
   }, [resolvedCoords?.lat, resolvedCoords?.lng]);
 
   // Set up 15-minute auto-refresh interval only
