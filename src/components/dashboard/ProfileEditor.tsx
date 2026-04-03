@@ -50,6 +50,8 @@ export function ProfileEditor() {
       const updateData: Record<string, unknown> = {
         full_name: form.full_name,
         city: form.city,
+        city_lat: form.city_lat,
+        city_lng: form.city_lng,
         preferred_platforms: form.preferred_platforms,
       };
       if (form.earnings_goal) {
