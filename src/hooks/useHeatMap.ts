@@ -139,7 +139,15 @@ Return ONLY a valid JSON array, no markdown, no wrapping.`,
 
       const jsonMatch = accumulated.match(/\[[\s\S]*\]/);
       if (jsonMatch) {
-        const parsed: DemandZone[] = JSON.parse(jsonMatch[0]);
+        const raw = jsonMatch[0];
+        const sanitised = raw
+          .replace(/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]/g, '')
+          .replace(/\n/g, ' ')
+          .replace(/\r/g, ' ')
+          .replace(/\t/g, ' ')
+          .replace(/,\s*]/g, ']')
+          .replace(/,\s*}/g, '}');
+        const parsed: DemandZone[] = JSON.parse(sanitised);
         const valid = parsed.filter(
           (z) =>
             z.name &&
