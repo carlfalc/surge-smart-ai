@@ -104,7 +104,7 @@ Score demand realistically based on:
 - Day: ${dayOfWeek} — weekends boost nightlife, weekdays boost business
 - Venue type and typical patterns for ${city}
 
-Return ONLY a valid JSON array, no markdown, no wrapping.`,
+Return ONLY a compact JSON array on as few lines as possible. No markdown, no backticks, no newlines inside string values. Keep reason field under 60 characters, single line only.`,
             },
           ],
           type: "heatmap",
