@@ -104,7 +104,7 @@ Score demand realistically based on:
 - Day: ${dayOfWeek} — weekends boost nightlife, weekdays boost business
 - Venue type and typical patterns for ${city}
 
-Return ONLY a valid JSON array, no markdown, no wrapping.`,
+Return ONLY a compact JSON array on as few lines as possible. No markdown, no backticks, no newlines inside string values. Keep reason field under 60 characters, single line only.`,
             },
           ],
           type: "heatmap",
@@ -139,7 +139,15 @@ Return ONLY a valid JSON array, no markdown, no wrapping.`,
 
       const jsonMatch = accumulated.match(/\[[\s\S]*\]/);
       if (jsonMatch) {
-        const parsed: DemandZone[] = JSON.parse(jsonMatch[0]);
+        const raw = jsonMatch[0];
+        const sanitised = raw
+          .replace(/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]/g, '')
+          .replace(/\n/g, ' ')
+          .replace(/\r/g, ' ')
+          .replace(/\t/g, ' ')
+          .replace(/,\s*]/g, ']')
+          .replace(/,\s*}/g, '}');
+        const parsed: DemandZone[] = JSON.parse(sanitised);
         const valid = parsed.filter(
           (z) =>
             z.name &&
