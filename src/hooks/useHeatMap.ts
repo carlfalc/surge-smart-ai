@@ -137,28 +137,17 @@ Return ONLY a compact JSON array on as few lines as possible. No markdown, no ba
         }
       }
 
-      const jsonMatch = accumulated.match(/\[[\s\S]*\]/);
-      if (jsonMatch) {
-        const raw = jsonMatch[0];
-        const sanitised = raw
-          .replace(/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]/g, '')
-          .replace(/\n/g, ' ')
-          .replace(/\r/g, ' ')
-          .replace(/\t/g, ' ')
-          .replace(/,\s*]/g, ']')
-          .replace(/,\s*}/g, '}');
-        const parsed: DemandZone[] = JSON.parse(sanitised);
-        const valid = parsed.filter(
-          (z) =>
-            z.name &&
-            typeof z.lat === "number" &&
-            typeof z.lng === "number" &&
-            typeof z.demand === "number" &&
-            typeof z.radius === "number" &&
-            z.demand >= 40
-        );
-        if (valid.length) setZones(valid);
+      const zones: DemandZone[] = [];
+      const zonePattern = /\{[^{}]*"name"\s*:\s*"[^"]+"[^{}]*\}/g;
+      const matches = accumulated.match(zonePattern) || [];
+      for (const m of matches) {
+        try {
+          const clean = m.replace(/[\x00-\x1F\x7F]/g,'').replace(/,\s*}/g,'}').replace(/:\s*,/g,': null,').replace(/:\s*}/g,': null}');
+          const z = JSON.parse(clean) as DemandZone;
+          if (z.name && typeof z.lat==='number' && typeof z.lng==='number' && typeof z.demand==='number' && typeof z.radius==='number' && z.demand>=40) zones.push(z);
+        } catch {}
       }
+      if (zones.length) setZones(zones);
     } catch (err) {
       console.error("HeatMap fetch error:", err);
     } finally {
